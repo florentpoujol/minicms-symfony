@@ -55,8 +55,13 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "style-check": "php ./tools/vendor/bin/php-cs-fixer fix --dry-run --diff -vvv",
-        "style-fix": "php ./tools/vendor/bin/php-cs-fixer fix --diff -vvv"
+        "style-fix": "php ./tools/vendor/bin/php-cs-fixer fix -vvv --ansi",
+        "style-check": "@style-fix --dry-run --diff",
+        "type-check": "php ./tools/vendor/bin/phpstan --ansi",
+        "fix": [
+            "@style-fix",
+            "@type-check"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"

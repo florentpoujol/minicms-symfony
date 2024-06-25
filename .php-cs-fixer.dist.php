@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 $finder = (new PhpCsFixer\Finder())
     ->in([
@@ -10,6 +10,10 @@ $finder = (new PhpCsFixer\Finder())
 return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony:risky'  => true,
+
+        'declare_strict_types' => true,
+        'strict_comparison' => true,
+        'strict_param' => true,
     ])
     ->setParallelConfig( \PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)

@@ -9,6 +9,6 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-.idea
+/.idea/
 /tools/vendor
 .php-cs-fixer.cache

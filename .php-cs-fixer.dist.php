@@ -15,6 +15,8 @@ return (new PhpCsFixer\Config())
         'declare_strict_types' => true,
         'strict_comparison' => true,
         'strict_param' => true,
+        'final_class' => true,
+        'void_return' => true,
     ])
     ->setParallelConfig( \PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)

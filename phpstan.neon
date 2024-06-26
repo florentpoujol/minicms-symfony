@@ -6,3 +6,8 @@ parameters:
     paths:
         - config
         - src
+        - tests
+
+    excludePaths:
+        - tests/Support/_generated/*
+        - tests/Support/*.php

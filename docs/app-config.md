@@ -18,3 +18,5 @@ Table: `app_config`:
 - `key varchar(255) not null` Since this field is unique and the table This is the Primary key
 - `value varchar(2000) not null`
 - timestamp fields
+
+Note: the PK may be changed for the regular id since it would certainly simplify the polymorphic relationship with the audit logs.

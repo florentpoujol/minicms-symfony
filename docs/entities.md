@@ -62,10 +62,7 @@ Posts are "articles", displayed in a timeline on the home page.
 
 A post has textual content, which may include medias like embedded images, as well as links to other media or websites.
 
-The text content is in markdown (maybe later via a WYSIWYG editor) but link to medias can be easily inserted via **shortcodes**.
-
-Shortcodes are custom markup that will resolve to a media properly embedded, with the correct link.
-Ie: `[media:{media slug}]`  could be replaced with `![{media alt text}]({media link})` for an image.
+The text content is in markdown (maybe later via a WYSIWYG editor) but link to medias can be easily inserted via **shortcodes** (see the media paragraph below).
 
 Posts have a title, from which is derived a unique and permanent slug, a text content, a creation date.    
 The slug is found in the posts URL, instead of the post's numerical id.  
@@ -112,6 +109,8 @@ Comments can be written and edited directly on the post page, not in the admin U
 
 Comments ar deleted when a user or a post are deleted.
 
+Unlike posts and pages, comment content is plain text, and do not support markdown or media shortcodes.
+
 **Database** 
 
 `comments` table:
@@ -129,8 +128,6 @@ Pages are almost like posts except they are not meant to be displayed in a timel
 A page has textual content, which may include medias like embedded images, as well as links to other media or websites.
 
 The text content of a page is the same as of a post.
-
-
 
 Pages have a title, from which is derived a unique and permanent slug, a  text content.  
 The slug is found in the pages URL, instead of the page's numerical id.
@@ -160,3 +157,64 @@ Since they are only written by admins and all admins can edit everything, page a
 - timestamp fields
 
 This is the exact same structure as the posts table, but since their usage is different, we keep them in separate tables. 
+
+
+## Medias
+
+Medias are files uploaded to site in order to be shown in the posts or pages (if they are images) or be directly downloaded via a link.
+
+Medias can be embedded in content via **shortcodes** so that they work whatever is main URL of the site is.
+
+Shortcodes are custom markup that will resolve to a media properly embedded, with the correct link.
+Ie: `[media:{media slug}]`  could be replaced with `![{media alt text}]({media link})` for an image (or just a regular link if not an image).
+
+The upload is limited to 2Mb, and limited to theses files types: `.zip`, `.pdf`, `.jp(e)g`, `.png`.  
+While each media has an entry in the DB, the actual file is stored on disk
+
+**CRUD**
+
+Media can be created/deleted by writer or admins, which owns them.
+Media can not be edited.
+
+
+**Database**
+
+Table `medias`:
+- `id PK`
+- `user_id FK users.id`
+- `slug varchar(255) not null`  with unique index on the first 50 characters
+- timestamp fields
+
+
+## Audit logs
+
+Audit logs are a records of the modification of every other entities.
+
+There is one audit log per creation, edition and deletion of users, posts, comments, pages and medias (but not audit logs).
+
+Audit logs are stored in the database, and must be created automatically based on Doctrine events (or whatever Doctrine has that allows to do that).
+
+An audit log stores 
+- who did the modification (which user was currently logged-in, if any)
+- by what interface (the admin UI, or an async job for instance)
+- what properties where modified and what was their value before and after
+
+They are immutable, read-only in the admin UI (even by admins), and can be seen by admin in the admin UI when on the detail of the corresponding entity. 
+
+While they have a nullable one-to-many relationship with the user that did the modification, they have a polymorphic many-to-many relationship to the entity that was modified.
+
+Care should be applied so that not all information are logged, like passwords or content that can be too long like media or even post/page content.
+
+**Database**
+
+`audit_logs` table:
+- `id PK`
+- `user_id nullable FK users.id` when the user is deleted nothing happens here, the field is left as-is, so the application needs to take that into account
+- `interface`
+- `before JSON nullable`
+- `after JSON nullable`
+- `created_at timestamp(3)` here we want a precision 
+- whatever fields are needed for the polymorphic relationship (in Laravel, this is two fields, one for the entity id and one for the entity type)
+
+The typical query pattern is (one object + within a date range + ordered by most recent date first).  
+So a compound index must be created to allow that.

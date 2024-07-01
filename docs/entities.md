@@ -218,3 +218,8 @@ Care should be applied so that not all information are logged, like passwords or
 
 The typical query pattern is (one object + within a date range + ordered by most recent date first).  
 So a compound index must be created to allow that.
+
+
+**Polymorphic relation**
+https://www.youtube.com/watch?v=hNAMEWYCkAM
+https://www.doctrine-project.org/projects/doctrine-orm/en/3.2/reference/inheritance-mapping.html

@@ -15,6 +15,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            pattern: ^/(login|logout|admin|profile)/?
             lazy: true
             provider: app_user_provider
             form_login:
@@ -33,11 +34,17 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_WRITER
+        ROLE_WRITER: ROLE_USER
+
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # /admin/* limited to writer and admins, this is not a mistake
+        # further access control will be added directly in controllers
+        - { path: ^/admin/?, roles: ROLE_WRITER }
+        - { path: ^/profile/?, roles: ROLE_USER }
 
 when@test:
     security:

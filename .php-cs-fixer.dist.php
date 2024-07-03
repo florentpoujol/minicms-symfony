@@ -44,7 +44,6 @@ return (new PhpCsFixer\Config())
         // no rules with PHP CS Fixer:
         // - put promoted properties always on their own lines > no rules
         // - put argument list on multiple line when longer than 120 chars or 3 arguments > no rule
-        // - make properties readonly when they can > no rules
     ])
     ->setParallelConfig( \PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)

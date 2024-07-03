@@ -102,9 +102,11 @@
         ],
         "style-fix": "php ./tools/vendor/bin/php-cs-fixer fix -vvv --ansi",
         "style-check": "@style-fix --dry-run --diff",
+        "rector-fix": "php ./tools/vendor/bin/rector process --ansi",
+        "rector-check": "@rector-fix --dry-run",
         "type-check": "php ./tools/vendor/bin/phpstan --ansi",
         "tests": "php vendor/bin/codecept run",
-        "check": [
+        "all": [
             "@style-fix",
             "@type-check",
             "@tests"

@@ -15,7 +15,9 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            pattern: ^/(login|verify|logout|admin|profile)/?
+            pattern:
+                - ^/(register|login|verify|logout)/?
+                - ^/(admin|profile)/?
             lazy: true
             provider: app_user_provider
             form_login:

@@ -9,7 +9,6 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
-
         '@Symfony:risky'  => true,
 
         'declare_strict_types' => true,
@@ -37,14 +36,15 @@ return (new PhpCsFixer\Config())
 
         'blank_line_before_statement' => [
             'statements' => ['declare', 'return'], // Symfony only has 'return'
-            // Note that this actually doesn't work for the declare(strict_type=1) lines when they are at the top of the file (which is the only pertinent place for them...)
+            // Note that this actually doesn't work for the declare(strict_types=1)k lines when they are at the top of the file (which is the only pertinent place for them...)
         ],
 
-        //        'concat_space' => 'one',
+        'concat_space' => ['spacing' => 'one'],
 
-        // TODO: put promoted properties always on their own lines > no rules
-        // TODO: put argument list on multiple line when longer than 120 chars or 3 arguments
-        // TODO: make properties readonly when they can > no rules
+        // no rules with PHP CS Fixer:
+        // - put promoted properties always on their own lines > no rules
+        // - put argument list on multiple line when longer than 120 chars or 3 arguments > no rule
+        // - make properties readonly when they can > no rules
     ])
     ->setParallelConfig( \PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)

@@ -11,6 +11,11 @@ return RectorConfig::configure()
         __DIR__ . '/tests',
     ])
     ->withPreparedSets(
+        deadCode: true,
+        typeDeclarations: true,
+        earlyReturn: true,
+        strictBooleans: true,
+
         symfonyCodeQuality: true,
         symfonyConfigs: true,
     )

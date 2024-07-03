@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
+
 $finder = (new PhpCsFixer\Finder())
     ->in([
         __DIR__.'/src',
@@ -45,7 +47,7 @@ return (new PhpCsFixer\Config())
         // - put promoted properties always on their own lines > no rules
         // - put argument list on multiple line when longer than 120 chars or 3 arguments > no rule
     ])
-    ->setParallelConfig( \PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
+    ->setParallelConfig(ParallelConfigFactory::detect())
     ->setFinder($finder)
     ->setRiskyAllowed(true)
 ;

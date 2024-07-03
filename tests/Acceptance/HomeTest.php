@@ -3,8 +3,9 @@
 namespace App\Tests\Acceptance;
 
 use App\Tests\Support\AcceptanceTester;
+use Codeception\Test\Unit;
 
-final class HomeTest extends \Codeception\Test\Unit
+final class HomeTest extends Unit
 {
     protected AcceptanceTester $tester;
 

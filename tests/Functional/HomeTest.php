@@ -3,8 +3,9 @@
 namespace App\Tests\Functional;
 
 use App\Tests\Support\FunctionalTester;
+use Codeception\Test\Unit;
 
-final class HomeTest extends \Codeception\Test\Unit
+final class HomeTest extends Unit
 {
     protected FunctionalTester $tester;
 

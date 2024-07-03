@@ -2,7 +2,6 @@
 
 $finder = (new PhpCsFixer\Finder())
     ->in([
-        __DIR__.'/config',
         __DIR__.'/src',
         __DIR__.'/tests',
     ])
@@ -10,6 +9,7 @@ $finder = (new PhpCsFixer\Finder())
 
 return (new PhpCsFixer\Config())
     ->setRules([
+
         '@Symfony:risky'  => true,
 
         'declare_strict_types' => true,
@@ -24,10 +24,27 @@ return (new PhpCsFixer\Config())
             'elements' => ['arguments', 'arrays', 'match', 'parameters'],
         ],
 
-        // TODO: put promoted properties always on their own lines
+        'phpdoc_line_span' => [
+            'const' => 'multi',
+            'method' => 'multi',
+            'property' => 'multi',
+        ],
+
+        'fully_qualified_strict_types' => [
+            'import_symbols' => true,
+            'leading_backslash_in_global_namespace' => true,
+        ],
+
+        'blank_line_before_statement' => [
+            'statements' => ['declare', 'return'], // Symfony only has 'return'
+            // Note that this actually doesn't work for the declare(strict_type=1) lines when they are at the top of the file (which is the only pertinent place for them...)
+        ],
+
+        //        'concat_space' => 'one',
+
+        // TODO: put promoted properties always on their own lines > no rules
         // TODO: put argument list on multiple line when longer than 120 chars or 3 arguments
-        // TODO: add spaces before declare(strict_type=1);
-        // TODO: make properties readonly when they can
+        // TODO: make properties readonly when they can > no rules
     ])
     ->setParallelConfig( \PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)

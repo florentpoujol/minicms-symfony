@@ -19,8 +19,9 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 final class RegistrationController extends AbstractController
 {
-    public function __construct(private readonly EmailVerifier $emailVerifier)
-    {
+    public function __construct(
+        private readonly EmailVerifier $emailVerifier,
+    ) {
     }
 
     #[Route('/register', name: 'app_register')]
@@ -43,6 +44,7 @@ final class RegistrationController extends AbstractController
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
+                    // TODO: fetch from address and name from BD config
                     ->from(new Address('contact@example.com', 'Acme Site'))
                     ->to($user->getEmail())
                     ->subject('Please Confirm your Email')

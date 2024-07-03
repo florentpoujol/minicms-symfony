@@ -12,7 +12,7 @@ final class LogTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
     ) {
     }
 

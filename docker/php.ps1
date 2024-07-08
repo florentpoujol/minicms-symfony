@@ -9,7 +9,9 @@ docker run --rm -v .:/var/minicms-symfony -w /var/minicms-symfony --network mini
 
 # For multiple words alias, we need to set it up as a function first:
 # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions?view=powershell-7.4
+
 # Function DockerSymfonyLocalCli { G:\code\minicms-symfony\docker\php.ps1 php bin/console --ansi $args }
+# Function dcomposer { G:\code\minicms-symfony\docker\php.ps1 composer --ansi $args }
 
 # then alias the function, or just give the correct name to the function in the first place
 # Set-Alias -Name dsymfony -value DockerSymfonyLocalCli

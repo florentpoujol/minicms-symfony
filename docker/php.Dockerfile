@@ -4,7 +4,8 @@ FROM php:8.3-fpm
 # install Composer
 COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
 
+# add the "install-php-extensions" tool
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
 # install non default PHP extensions
-RUN apt-get update && apt-get install -y \
-    		libzip-dev \
-    && docker-php-ext-install pdo_mysql zip
+RUN install-php-extensions pdo_mysql zip mbstring

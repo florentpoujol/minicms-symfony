@@ -48,11 +48,6 @@
         "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
-        "codeception/codeception": "^5.1",
-        "codeception/module-asserts": "^3.0",
-        "codeception/module-doctrine": "^3.1",
-        "codeception/module-phpbrowser": "^3.0",
-        "codeception/module-symfony": "^3.4",
         "phpunit/phpunit": "^11.2",
         "symfony/browser-kit": "7.1.*",
         "symfony/css-selector": "7.1.*",
@@ -107,7 +102,7 @@
         "style-fix": "php ./tools/vendor/bin/php-cs-fixer fix -vvv --ansi",
         "style-check": "@style-fix --dry-run --diff",
         "type-check": "php ./tools/vendor/bin/phpstan --ansi",
-        "cests": "php vendor/bin/codecept run",
+        "tests": "php vendor/bin/phpunit",
         "fix": [
             "@rector-fix",
             "@style-fix",
@@ -117,7 +112,7 @@
             "@rector-fix",
             "@style-fix",
             "@type-check",
-            "@cests"
+            "@tests"
         ]
     },
     "conflict": {

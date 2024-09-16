@@ -1,21 +1,19 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Functional;
+namespace App\Tests\Controllers ;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Tests\Support\FunctionalTester;
-use Codeception\Test\Unit;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class SecurityTest extends Unit
+final class SecurityTest extends WebTestCase
 {
-    protected FunctionalTester $tester;
     private readonly UserRepository $userRepository;
     private readonly User $user;
     private readonly User $writer;
     private readonly User $admin;
 
-    protected function _before(): void
+    protected function setUp(): void
     {
         // @phpstan-ignore-next-line
         $this->userRepository = $this->tester->grabRepository(UserRepository::class);

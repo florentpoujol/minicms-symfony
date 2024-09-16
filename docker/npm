@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# This file is aliased to the "dnpm" command
+
+docker run --rm -v .:/var/minicms-symfony -w /var/minicms-symfony -i node:20.15 npm --no-update-notifier "$@"

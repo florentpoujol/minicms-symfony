@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# This file is aliased to the "dnode" command
+
+docker run --rm -v .:/var/minicms-symfony -w /var/minicms-symfony node:20.15 "$@"

@@ -25,4 +25,29 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+    'vue' => [
+        'version' => '3.4.31',
+        'package_specifier' => 'vue/dist/vue.esm-bundler.js',
+    ],
+    '@vue/runtime-dom' => [
+        'version' => '3.4.31',
+    ],
+    '@vue/compiler-dom' => [
+        'version' => '3.4.31',
+    ],
+    '@vue/shared' => [
+        'version' => '3.4.31',
+    ],
+    '@vue/runtime-core' => [
+        'version' => '3.4.31',
+    ],
+    '@vue/compiler-core' => [
+        'version' => '3.4.31',
+    ],
+    '@vue/reactivity' => [
+        'version' => '3.4.31',
+    ],
+    '@symfony/ux-vue' => [
+        'path' => './vendor/symfony/ux-vue/assets/dist/loader.js',
+    ],
 ];

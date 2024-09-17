@@ -9,9 +9,7 @@ final class HomeControllerTest extends WebTestCase
 {
     public function testWeCanSeeTheHomePage(): void
     {
-        $client = self::createClient();
-
-        $client->request(Request::METHOD_GET, '/home');
+        self::createClient()->request(Request::METHOD_GET, '/');
 
         self::assertResponseIsSuccessful();
         self::assertAnySelectorTextContains('h1', 'Hello HomeController');

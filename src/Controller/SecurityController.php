@@ -99,7 +99,7 @@ final class SecurityController extends AbstractController
     // login
 
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, ): Response
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->security->isGranted('IS_AUTHENTICATED')) {
             return $this->redirectToRoute('app_profile');

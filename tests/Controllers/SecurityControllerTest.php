@@ -3,7 +3,7 @@
 namespace App\Tests\Controllers ;
 
 use App\Entity\User;
-use App\Repository\UserRepository;
+use Closure;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,11 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class SecurityControllerTest extends WebTestCase
 {
     private readonly KernelBrowser $client;
-
-    private readonly UserRepository $userRepository;
-    private readonly User $user;
-    private readonly User $writer;
-    private readonly User $admin;
+    private static User $user;
+    private static User $writer;
+    private static User $admin;
 
     protected function setUp(): void
     {
@@ -23,71 +21,85 @@ final class SecurityControllerTest extends WebTestCase
         $container = self::getContainer();
         $entityManager = $container->get('doctrine')->getManager(); // @phpstan-ignore-line
 
-        $this->userRepository = $entityManager->getRepository(User::class);
+        $userRepository = $entityManager->getRepository(User::class);
 
-        $this->user = $this->userRepository->findOneBy(['email' => 'user@example.com']);
-        $this->writer = $this->userRepository->findOneBy(['email' => 'writer@example.com']);
-        $this->admin = $this->userRepository->findOneBy(['email' => 'admin@example.com']);
+        // the variable here must be static, otherwise PHP complain that within the tests we access the properties
+        // before theirs initialisation, even when the data provider return a closure...
+        self::$user = $userRepository->findOneBy(['email' => 'user@example.com']);
+        self::$writer = $userRepository->findOneBy(['email' => 'writer@example.com']);
+        self::$admin = $userRepository->findOneBy(['email' => 'admin@example.com']);
     }
-
-    public function testAnonCantAccessProfile(): void
-    {
-        $this->client->request(Request::METHOD_GET, '/profile');
-
-        self::assertResponseRedirects('/login');
-    }
-
-    public function testAnonCantAccessAdmin(): void
-    {
-        $this->client->request(Request::METHOD_GET, '/admin');
-
-        self::assertResponseRedirects('/login');
-    }
-
-   // public function testUserCantAccessAdmin(): void
-   // {
-   //     // TODO Seed user
-   //     $this->tester->amLoggedInAs();
-   //     $this->tester->amOnPage('/admin');
-   //     $this->tester->dontSeeAuthentication();
-   // }
-
-    // public function testDontSeeRememberedAuthentication(): void
-    // {
-    //     $this->tester->amOnPage('/login');
-    //     $this->tester->submitForm('form[name=login]', [
-    //         'email' => 'john_doe@gmail.com',
-    //         'password' => '123456',
-    //         '_remember_me' => false,
-    //     ]);
-    //     $this->tester->dontSeeRememberedAuthentication();
-    // }
 
     /**
-     * @return list<list<string>>
+     * @return array<string, list<Closure(): User>>
      */
-    public function getUsers(): array
+    public function getAllUsers(): array
     {
         return [
-            ['user'],
-            ['writer'],
-            ['admin'],
+            'user' => [fn (): User => self::$user],
+            'writer' => [fn (): User => self::$writer],
+            'admin' => [fn (): User => self::$admin],
         ];
     }
 
-    /**
-     * @dataProvider getUsers
-     */
-    public function testUserHasRole(string $propertyName): void
+    public function testAnonCantAccessProfileOrAdmin(): void
     {
-        $user = $this->{$propertyName}; // @phpstan-ignore-line (variable property access)
-        \assert($user instanceof User);
+        $this->client->request(Request::METHOD_GET, '/profile');
+        self::assertResponseRedirects('/login');
+
+        $this->client->request(Request::METHOD_GET, '/admin');
+        self::assertResponseRedirects('/login');
+    }
+
+    /**
+     * @dataProvider getAllUsers
+     *
+     * @param Closure(): User $userReturner
+     */
+    public function testUsersCanAccessProfile(Closure $userReturner): void
+    {
+        $user = $userReturner();
+
+        $this->client->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/profile');
+
+        self::assertResponseIsSuccessful();
+    }
+
+    /**
+     * @dataProvider getAllUsers
+     *
+     * @param Closure(): User $userReturner
+     */
+    public function testUserCanAccessAdminOrNot(Closure $userReturner): void
+    {
+        $user = $userReturner();
+
+        $this->client->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/admin');
+
+        if ($user->getEmail() === 'user@example.com') {
+            self::assertResponseStatusCodeSame(403);
+        } else {
+            self::assertResponseIsSuccessful();
+        }
+    }
+
+    /**
+     * @dataProvider getAllUsers
+     *
+     * @param Closure(): User $userReturner
+     */
+    public function testUserHasRole(Closure $userReturner): void
+    {
+        $user = $userReturner();
 
         $this->client->loginUser($user);
         $this->client->request(Request::METHOD_GET, '/');
 
         $roles = $user->getRoles();
 
+        // for every one because always added by Symfony
         self::assertTrue(\in_array('ROLE_USER', $roles, true));
 
         if ($user->getEmail() === 'writer@example.com') { // writer and admin
@@ -100,36 +112,4 @@ final class SecurityControllerTest extends WebTestCase
             self::assertTrue(\in_array('ROLE_ADMIN', $roles, true));
         }
     }
-
-    /**
-     * @dataProvider getUserEmails
-     */
-    // public function testLoggedInUserCanSeeProfile(int $userId): void
-    // {
-    //     $repo = $this->tester->grabRepository(UserRepository::class);
-    //     $user = $repo->find($userId);
-    //
-    //     $this->tester->amLoggedInAs($user);
-    //     $this->tester->amOnPage('/profile');
-    //
-    //     $this->tester->seeAuthentication();
-    // }
-
-    /**
-     * @dataProvider getUserEmails
-     */
-    // public function testLoggedInUserCanSeeAdmin(int $userId): void
-    // {
-    //     if ($userId == 1) {
-    //         $this->markTestSkipped();
-    //     }
-    //
-    //     $repo = $this->tester->grabRepository(UserRepository::class);
-    //     $user = $repo->find($userId);
-    //
-    //     $this->tester->amLoggedInAs($user);
-    //     $this->tester->amOnPage('/admin');
-    //
-    //     $this->tester->seeAuthentication();
-    // }
 }

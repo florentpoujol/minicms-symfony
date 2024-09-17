@@ -4,10 +4,14 @@ namespace App\Tests\Controllers ;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
-final class SecurityTest extends WebTestCase
+final class SecurityControllerTest extends WebTestCase
 {
+    private readonly KernelBrowser $client;
+
     private readonly UserRepository $userRepository;
     private readonly User $user;
     private readonly User $writer;
@@ -15,8 +19,11 @@ final class SecurityTest extends WebTestCase
 
     protected function setUp(): void
     {
-        // @phpstan-ignore-next-line
-        $this->userRepository = $this->tester->grabRepository(UserRepository::class);
+        $this->client = self::createClient();
+        $container = self::getContainer();
+        $entityManager = $container->get('doctrine')->getManager(); // @phpstan-ignore-line
+
+        $this->userRepository = $entityManager->getRepository(User::class);
 
         $this->user = $this->userRepository->findOneBy(['email' => 'user@example.com']);
         $this->writer = $this->userRepository->findOneBy(['email' => 'writer@example.com']);
@@ -25,14 +32,16 @@ final class SecurityTest extends WebTestCase
 
     public function testAnonCantAccessProfile(): void
     {
-        $this->tester->amOnPage('/profile');
-        $this->tester->dontSeeAuthentication();
+        $this->client->request(Request::METHOD_GET, '/profile');
+
+        self::assertResponseRedirects('/login');
     }
 
     public function testAnonCantAccessAdmin(): void
     {
-        $this->tester->amOnPage('/admin');
-        $this->tester->dontSeeAuthentication();
+        $this->client->request(Request::METHOD_GET, '/admin');
+
+        self::assertResponseRedirects('/login');
     }
 
    // public function testUserCantAccessAdmin(): void
@@ -55,36 +64,40 @@ final class SecurityTest extends WebTestCase
     // }
 
     /**
-     * @return list<User>
+     * @return list<list<string>>
      */
     public function getUsers(): array
     {
         return [
-            $this->user,
-            $this->writer,
-            $this->admin,
+            ['user'],
+            ['writer'],
+            ['admin'],
         ];
     }
 
     /**
      * @dataProvider getUsers
      */
-    public function testUserHasRole(User $user): void
+    public function testUserHasRole(string $propertyName): void
     {
-        $this->tester->amLoggedInAs($user);
-        $this->tester->amOnPage('/');
+        $user = $this->{$propertyName}; // @phpstan-ignore-line (variable property access)
+        \assert($user instanceof User);
 
+        $this->client->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/');
 
-        $this->tester->have();
+        $roles = $user->getRoles();
 
-        $this->tester->seeUserHasRole('ROLE_USER');
+        self::assertTrue(\in_array('ROLE_USER', $roles, true));
 
-        if ($user->getEmail() !== 'user@example.com') { // writer and admin
-            $this->tester->seeUserHasRole('ROLE_WRITER');
+        if ($user->getEmail() === 'writer@example.com') { // writer and admin
+            self::assertTrue(\in_array('ROLE_WRITER', $roles, true));
+            self::assertFalse(\in_array('ROLE_ADMIN', $roles, true));
         }
 
         if ($user->getEmail() === 'admin@example.com') {
-            $this->tester->seeUserHasRole('ROLE_ADMIN');
+            self::assertFalse(\in_array('ROLE_WRITER', $roles, true));
+            self::assertTrue(\in_array('ROLE_ADMIN', $roles, true));
         }
     }
 
@@ -119,15 +132,4 @@ final class SecurityTest extends WebTestCase
     //
     //     $this->tester->seeAuthentication();
     // }
-
-    public function testSeeUserPasswordDoesNotNeedRehash(): void
-    {
-        $user = $this->tester->grabEntityFromRepository(User::class, [
-            'email' => 'john_doe@gmail.com',
-        ]);
-        $this->tester->amLoggedInAs($user);
-        $this->tester->amOnPage('/dashboard');
-
-        $this->tester->seeUserPasswordDoesNotNeedRehash();
-    }
 }

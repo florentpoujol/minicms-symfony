@@ -43,6 +43,10 @@ return (new PhpCsFixer\Config())
 
         'concat_space' => ['spacing' => 'one'],
 
+        // only works for built-in PHPUnit assertion, not for Symfony assertions.
+        // see also the ThisCallOnStaticMethodToStaticCallRector rector rules that supposedly do what I want but doesn't seem to work
+        'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
+
         // no rules with PHP CS Fixer:
         // - put promoted properties always on their own lines > no rules
         // - put argument list on multiple line when longer than 120 chars or 3 arguments > no rule

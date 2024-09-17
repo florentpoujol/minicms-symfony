@@ -3,6 +3,7 @@
 namespace App\Tests\Controllers;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 final class HomeControllerTest extends WebTestCase
 {
@@ -10,9 +11,9 @@ final class HomeControllerTest extends WebTestCase
     {
         $client = self::createClient();
 
-        $client->request('GET', '/home');
+        $client->request(Request::METHOD_GET, '/home');
 
-        $this->assertResponseIsSuccessful();
-        $this->assertAnySelectorTextContains('h1', 'Hello HomeController');
+        self::assertResponseIsSuccessful();
+        self::assertAnySelectorTextContains('h1', 'Hello HomeController');
     }
 }

@@ -11,3 +11,13 @@ parameters:
     excludePaths:
         - tests/Support/_generated/*
         - tests/Support/*.php
+
+    ignoreErrors:
+        -
+            message: '#Class .+Test has an uninitialized readonly property .+\. Assign it in the constructor\.#'
+            paths:
+                - tests/*
+        -
+            message: '#Readonly property .+ is assigned outside of the constructor\.#'
+            paths:
+                - tests/*

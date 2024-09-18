@@ -11,4 +11,4 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 RUN apt update && apt install -y unzip git
 
 # install non default PHP extensions
-RUN install-php-extensions pdo_mysql zip mbstring
+RUN install-php-extensions pdo_mysql zip mbstring intl

@@ -16,6 +16,21 @@ final class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
+    /**
+     * @return array<Article>
+     */
+    public function getAllPublished(): array
+    {
+        // @phpstan-ignore-next-line (should return ... but returns mixed)
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.published_at is not null')
+            ->orderBy('a.published_at', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 //    /**
 //     * @return Article[] Returns an array of Article objects
 //     */

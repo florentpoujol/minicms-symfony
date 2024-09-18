@@ -14,13 +14,14 @@ See also, from 2018, the same kind of project but without framework, or even wit
 
 ### Users
 
-- [ ] 3 roles: admin, writer, commenter
-- [ ] registering of new users via a public form or by admins
-- [ ] emails of new users must be validated via a link sent to their address
+- [X] 3 roles: admin, writer, commenter
+- [X] registering of new users via a public form or by admins
+    - [ ] by admins
+- [X] emails of new users must be validated via a link sent to their address
 - [ ] registering can be turned off globally
-- [ ] Standard login via username and password
+- [X] Standard login via username and password
 - [ ] forgot password function that sends an email to the user allowing him to access the form to reset the password within 48h
-- [ ] commenters can only edit their profile
+- [X] commenters can only edit their profile
 - [ ] writers can see all existing users and edit their profile
 - [ ] admins can see/edit/delete all users
 - [ ] users can't delete themselves
@@ -36,7 +37,7 @@ See also, from 2018, the same kind of project but without framework, or even wit
 - [ ] standard posts linked to categories
 - [ ] content is markdown
 - [ ] only created by admin or writers
-- [ ] can have comments (comments can be turned of on a per-post basis)
+- [ ] can have comments (comments can be turned off on a per-post basis)
 - [ ] the blog page show the X last posts
 - [ ] the blog page show the last posts with a list of the categories in a sidebar
 
@@ -63,5 +64,5 @@ See also, from 2018, the same kind of project but without framework, or even wit
 - [ ] emails can be sent via the local email software or SMTP
 - [ ] global configuration saved in the DB, can be edited by admins via a form
 - [ ] works as a subfolder or the root of a domain name
-- [ ] links to pages, posts, categories and medias can be added in the content via wordpress-like shortcodes. Ie: [link:mdedia:the-media-slug]
+- [ ] links to pages, posts, categories and medias can be added in the content via wordpress-like shortcodes. Ie: [link:media:the-media-slug]
 - [ ] optional use of Recaptcha on all public forms (set via the secret key in config)

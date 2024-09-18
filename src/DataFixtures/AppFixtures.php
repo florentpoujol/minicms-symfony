@@ -16,10 +16,14 @@ final class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $now = new \DateTimeImmutable();
+
         $user = new User();
         $user->setEmail('user@example.com');
         $user->setPassword($this->userPasswordHasher->hashPassword($user, 'user'));
         $user->setVerified(true);
+        $user->setCreatedAt($now);
+        $user->setUpdatedAt($now);
         $manager->persist($user);
 
         $user = new User();
@@ -27,6 +31,8 @@ final class AppFixtures extends Fixture
         $user->setPassword($this->userPasswordHasher->hashPassword($user, 'writer'));
         $user->setRoles(['ROLE_WRITER']);
         $user->setVerified(true);
+        $user->setCreatedAt($now);
+        $user->setUpdatedAt($now);
         $manager->persist($user);
 
         $user = new User();
@@ -34,6 +40,8 @@ final class AppFixtures extends Fixture
         $user->setPassword($this->userPasswordHasher->hashPassword($user, 'admin'));
         $user->setRoles(['ROLE_ADMIN']);
         $user->setVerified(true);
+        $user->setCreatedAt($now);
+        $user->setUpdatedAt($now);
         $manager->persist($user);
 
         $manager->flush();

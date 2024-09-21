@@ -83,6 +83,20 @@ final class AppFixtures extends Fixture
         $this->manager->persist($article);
 
         $article = new Article();
+        $article->setTitle('my other article');
+        $article->setSlug('my-other-article');
+        $article->setContent(<<<TXT
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in efficitur enim. Suspendisse vitae enim in dui ornare sollicitudin. Pellentesque nisl felis, tempor vel urna sit amet, tempor blandit ligula. Sed elementum faucibus vehicula. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus ornare pretium tellus, vitae sollicitudin nisi tincidunt sed. Aliquam iaculis, arcu sed tincidunt fermentum, mauris ligula tincidunt sem, ac aliquet felis ligula eu ante. Nulla non placerat dolor. Pellentesque pulvinar, orci eget pulvinar scelerisque, libero ipsum rhoncus sapien, eget lobortis quam turpis eu nisi. Nunc ante urna, consequat ornare malesuada eget, ultrices nec arcu. Nunc suscipit ac augue ac sagittis. Nunc feugiat tempus nunc vel ornare. Vestibulum elementum eros id dui lacinia faucibus. Suspendisse pellentesque massa sed justo fringilla, ac convallis quam sodales. Aliquam interdum eleifend suscipit. Vivamus molestie rhoncus mauris, ut elementum nisl.
+
+        Suspendisse potenti. Nam pretium augue id nunc convallis dapibus. Aenean finibus tristique ante at volutpat. Mauris vehicula feugiat pulvinar. Aliquam nec eros quis augue faucibus commodo at quis odio. Curabitur sed accumsan eros. Aenean eleifend porta nulla sed porta.
+        TXT);
+        $article->setPublishedAt($now->modify('+ 1 day'));
+        $article->setCreatedAt($now->modify('+ 1 day'));
+        $article->setUpdatedAt($now->modify('+ 1 day'));
+        $article->setUser($writer);
+        $this->manager->persist($article);
+
+        $article = new Article();
         $article->setTitle('my draft article');
         $article->setSlug('my-draft-article');
         $article->setContent(<<<TXT

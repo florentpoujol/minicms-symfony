@@ -22,6 +22,22 @@ final class ArticleRepository extends ServiceEntityRepository
     public function getAllPublished(): array
     {
         // @phpstan-ignore-next-line (should return ... but returns mixed)
+        return $this->getEntityManager()
+            ->createQuery(<<<DQL
+            SELECT a, u
+            FROM App\Entity\Article a
+            INNER JOIN a.user u
+            WHERE
+            a.user = u.id
+            and a.published_at is not null
+            order by a.published_at desc
+            DQL)
+            ->getResult()
+        ;
+
+        /*
+        without eager loading this query can work :
+
         return $this->createQueryBuilder('a')
             ->andWhere('a.published_at is not null')
             ->orderBy('a.published_at', 'DESC')
@@ -29,6 +45,7 @@ final class ArticleRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+        */
     }
 
 //    /**

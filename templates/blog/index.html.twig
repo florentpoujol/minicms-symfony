@@ -11,7 +11,7 @@
     {% for article in articles %}
         <article>
             <h3>{{ article.title }}</h3>
-            <aside>Published on {{ article.publishedAt | format_datetime('full', locale: 'fr') }} by</aside>
+            <aside>Published on {{ article.publishedAt | format_datetime('full', locale: 'fr') }} by {{ article.user.email }}</aside>
 
             <p>
                 {{ article.content }} ...

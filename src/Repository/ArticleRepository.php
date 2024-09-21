@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Article;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -46,6 +47,30 @@ final class ArticleRepository extends ServiceEntityRepository
             ->getResult()
         ;
         */
+    }
+
+    /**
+     * @return array<Article>
+     */
+    public function getAllForAdmin(User $user): array
+    {
+        $builder = $this->createQueryBuilder('a')
+            ->addSelect('u')
+            ->innerJoin('a.user', 'u')
+            ->andWhere('a.user = u.id')
+            ->orderBy('a.published_at', 'DESC');
+
+        if ($user->isWriter()) {
+            $builder
+                ->andWhere('a.user = :userId')
+                ->setParameter('userId', $user->getId());
+        }
+
+        // @phpstan-ignore-next-line (should return ... but returns mixed)
+        return $builder
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
 //    /**

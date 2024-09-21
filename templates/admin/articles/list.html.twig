@@ -1,0 +1,44 @@
+{% extends 'admin/base-admin.html.twig' %}
+
+{% block title %}Articles{% endblock %}
+
+{% block steelsheets %}
+<style>
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div>
+    <h1>Articles</h1>
+
+    <table>
+        <tr>
+            <th>Id</th>
+            <th>Writer</th>
+            <th>Title</th>
+            <th>Slug</th>
+            <th>Content size</th>
+            <th>Allow comments</th>
+            <th>Published</th>
+            <th>Created</th>
+            <th>Updated</th>
+        </tr>
+
+        {% for article in articles %}
+        <tr>
+            <td>{{ article.id }}</td>
+            <td>{{ article.user.email }}</td>
+            <td>{{ article.title }}</td>
+            <td>{{ article.slug }}</td>
+            <td>{{ article.content | strlen }} chars</td>
+            <td>{{ article.allowComments }}</td>
+            <td>{{ article.publishedAt ? article.publishedAt | format_datetime('short', locale: 'fr') : 'Draft' }}</td>
+            <td>{{ article.createdAt | format_datetime('short', locale: 'fr') }}</td>
+            <td>{{ article.updatedAt | format_datetime('short', locale: 'fr') }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

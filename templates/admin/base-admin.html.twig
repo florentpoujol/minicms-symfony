@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin: {% block title %}{% endblock %}</title>
+
+        {% block stylesheets %}
+        <style>
+            table, tr, td, th {
+                border: 1px solid gray;
+                border-collapse: collapse;
+            }
+            th {
+                font-weight: bold;
+            }
+            td, th {
+                padding: 5px;
+            }
+        </style>
+        {% endblock %}
+
+        {% block javascripts %}
+            {#  {% block importmap %}{{ importmap('app') }}{% endblock %}#}
+        {% endblock %}
+    </head>
+    <body>
+        <nav>
+            <ul>
+                <li><a href="{{ path('app_home') }}">Home</a></li>
+                <li><a href="{{ path('admin_dashboard') }}">Admin dashboard</a></li>
+                <li><a href="{{ path('admin_articles_list') }}">Articles</a></li>
+                <li><a href="{{ path('app_logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+        {% block body %}{% endblock %}
+    </body>
+</html>

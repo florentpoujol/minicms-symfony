@@ -196,4 +196,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function isWriter(): bool
+    {
+        return \in_array('ROLE_WRITER', $this->getRoles(), true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return \in_array('ROLE_ADMIN', $this->getRoles(), true);
+    }
 }

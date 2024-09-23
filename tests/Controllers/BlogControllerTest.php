@@ -66,13 +66,11 @@ final class BlogControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $title = $article->getTitle();
-        \assert(\is_string($title));
-        self::assertAnySelectorTextContains('h1', $title);
+        self::assertAnySelectorTextContains('h1', $article->getTitle());
 
         self::assertAnySelectorTextContains('aside', 'Published on lundi 23 septembre 2024 à 13:14:03 by writer@example.com');
 
-        self::assertStringContainsString((string) $article->getContent(), $this->getResponseContent()); // can't use assertAnySelectorTextContains() here, I think it doesn't properly handle the carriage return
+        self::assertStringContainsString($article->getContent(), $this->getResponseContent()); // can't use assertAnySelectorTextContains() here, I think it doesn't properly handle the carriage return
     }
 
     public function testGuestCantSeeArticleWhenDraft(): void
@@ -95,10 +93,8 @@ final class BlogControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $title = $article->getTitle();
-        \assert(\is_string($title));
-        self::assertAnySelectorTextContains('h1', $title);
+        self::assertAnySelectorTextContains('h1', $article->getTitle());
 
-        self::assertStringContainsString((string) $article->getContent(), $this->getResponseContent()); // can't use assertAnySelectorTextContains() here, I think it doesn't properly handle the carriage return
+        self::assertStringContainsString($article->getContent(), $this->getResponseContent()); // can't use assertAnySelectorTextContains() here, I think it doesn't properly handle the carriage return
     }
 }

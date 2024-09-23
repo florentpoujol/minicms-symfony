@@ -59,11 +59,8 @@ final class ArticleController extends AbstractController
             $article = $form->getData();
 
             if ($isCreateForm) {
-                $title = $article->getTitle();
-                \assert(\is_string($title));
-
                 $slugger = new AsciiSlugger();
-                $slug = $slugger->slug($title)->toString();
+                $slug = $slugger->slug($article->getTitle())->toString();
                 $article->setSlug($slug);
 
                 $article->setUser($user);

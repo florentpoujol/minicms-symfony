@@ -28,6 +28,7 @@
             <th>Published</th>
             <th>Created</th>
             <th>Updated</th>
+            <th>Actions</th>
         </tr>
 
         {% for article in articles %}
@@ -41,6 +42,10 @@
             <td>{{ article.publishedAt ? article.publishedAt | format_datetime('short', locale: 'fr') : 'Draft' }}</td>
             <td>{{ article.createdAt | format_datetime('short', locale: 'fr') }}</td>
             <td>{{ article.updatedAt | format_datetime('short', locale: 'fr') }}</td>
+            <td>
+                    <a href="{{ path('app_article_show', {slug: article.slug}) }}">Read</a> <br>
+                    <a href="{{ path('admin_articles_edit', {slug: article.slug}) }}">Edit</a>
+            </td>
         </tr>
         {% endfor %}
     </table>

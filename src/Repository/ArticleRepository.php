@@ -30,7 +30,7 @@ final class ArticleRepository extends ServiceEntityRepository
             INNER JOIN a.user u
             WHERE
             a.user = u.id
-            and a.published_at is not null
+            and a.published_at < CURRENT_TIMESTAMP() 
             order by a.published_at desc
             DQL)
             ->getResult()

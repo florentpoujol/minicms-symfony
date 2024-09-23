@@ -151,4 +151,10 @@ class Article
 
         return $this;
     }
+
+    public function setCurrentTimestamps(): void
+    {
+        $this->created_at = new \DateTimeImmutable();
+        $this->updated_at = clone $this->created_at;
+    }
 }

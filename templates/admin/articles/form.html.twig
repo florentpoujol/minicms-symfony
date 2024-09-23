@@ -1,0 +1,37 @@
+{% extends 'admin/base-admin.html.twig' %}
+
+{% block title %}
+    {% if isCreateForm %}
+        Create a new article
+    {% else %}
+        Edit an article
+    {% endif %}
+{% endblock %}
+
+{% block steelsheets %}
+<style>
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div>
+    <h1>
+        {% if isCreateForm %}
+            Create a new article
+        {% else %}
+            Edit an article
+        {% endif %}
+    </h1>
+
+    {{ form(form) }}
+
+    {% if not isCreateForm %}
+    <ul>
+        <li>Created at: {{ article.createdAt | format_datetime('short', locale: 'fr') }} by {{  article.user.email }}</li>
+        <li>Last updated at: {{ article.updatedAt | format_datetime('short', locale: 'fr') }}</li>
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}

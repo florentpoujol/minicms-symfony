@@ -25,13 +25,15 @@
         {% endif %}
     </h1>
 
+    {% if not isCreateForm %}
+        <ul>
+            <li>Direct link to the article: <a href="{{ path('app_article_show', {'slug': article.slug}) }}">{{ article.slug }}</a></li>
+            <li>Created at: {{ article.createdAt | format_datetime('short', locale: 'fr') }} by {{  article.user.email }}</li>
+            <li>Last updated at: {{ article.updatedAt | format_datetime('short', locale: 'fr') }}</li>
+        </ul>
+    {% endif %}
+
     {{ form(form) }}
 
-    {% if not isCreateForm %}
-    <ul>
-        <li>Created at: {{ article.createdAt | format_datetime('short', locale: 'fr') }} by {{  article.user.email }}</li>
-        <li>Last updated at: {{ article.updatedAt | format_datetime('short', locale: 'fr') }}</li>
-    </ul>
-    {% endif %}
 </div>
 {% endblock %}

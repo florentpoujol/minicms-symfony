@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{% endblock %}
+
+{% block body %}
+<div>
+    <article>
+        <h1>{{ article.title }}</h1>
+
+        <aside>Published on {{ article.publishedAt | format_datetime('full', locale: 'fr') }} by {{ article.user.email }}</aside>
+
+        <p>
+            {{ article.content }}
+        </p>
+    </article>
+
+</div>
+{% endblock %}

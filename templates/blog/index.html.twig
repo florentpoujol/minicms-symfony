@@ -4,19 +4,19 @@
 
 {% block body %}
 <div>
-    <h1>Blog</h1>
-
-    <h2>Articles</h2>
+    <h1>Articles</h1>
 
     {% for article in articles %}
         <article>
-            <h3>{{ article.title }}</h3>
+            <h2>{{ article.title }}</h2>
             <aside>Published on {{ article.publishedAt | format_datetime('full', locale: 'fr') }} by {{ article.user.email }}</aside>
 
             <p>
-                {{ article.content }} ...
+                {{ article.content | show_excerpt }} ...
             </p>
         </article>
+
+        <a href="{{ path('app_article_show', {slug: article.slug}) }}">Read more</a>
 
         <hr>
     {%  endfor %}

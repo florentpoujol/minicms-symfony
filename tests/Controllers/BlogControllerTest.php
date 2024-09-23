@@ -12,6 +12,6 @@ final class BlogControllerTest extends WebTestCase
         self::createClient()->request(Request::METHOD_GET, '/');
 
         self::assertResponseIsSuccessful();
-        self::assertAnySelectorTextContains('h1', 'Blog');
+        self::assertAnySelectorTextContains('h1', 'Articles');
     }
 }

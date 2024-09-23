@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Entity\User;
-use App\Form\ArticleType;
+use App\Form\ArticleForm;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -40,7 +40,7 @@ final class ArticleController extends AbstractController
 
     #[Route('/admin/articles/create', name: 'admin_articles_create')]
     #[Route('/admin/articles/{slug}/edit', name: 'admin_articles_edit')]
-    public function create(
+    public function form(
         #[MapEntity(mapping: ['slug' => 'slug'])]
         ?Article $article,
         #[CurrentUser]
@@ -51,7 +51,7 @@ final class ArticleController extends AbstractController
     {
         $isCreateForm = $article === null;
 
-        $form = $this->createForm(ArticleType::class, $article);
+        $form = $this->createForm(ArticleForm::class, $article);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

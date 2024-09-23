@@ -5,8 +5,9 @@ namespace App\Entity;
 use App\Repository\ArticleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ORM\Table(name: '`article`')]
@@ -19,12 +20,16 @@ class Article
     #[ORM\Column]
     private ?int $id = null;
 
+    #[NotBlank]
+    #[Length(max: 200)]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[NotBlank]
+    #[Length(max: 99_999)]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 

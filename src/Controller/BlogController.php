@@ -3,11 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\User;
 use App\Repository\ArticleRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Twig\Environment;
 use Twig\TwigFilter;
 
@@ -33,7 +36,16 @@ final class BlogController extends AbstractController
     public function showArticle(
         #[MapEntity(mapping: ['slug' => 'slug'])] // note: from the documentation, this should work without the explicit mapping
         Article $article,
+        #[CurrentUser]
+        ?User $user,
     ): Response {
+        if (
+            $user === null &&
+            ($article->getPublishedAt() === null || $article->getPublishedAt() > new \DateTimeImmutable())
+        ) {
+            return $this->render('blog/not-found.html.twig', [], new Response(status: Response::HTTP_NOT_FOUND));
+        }
+
         return $this->render('blog/article.html.twig', [
             'article' => $article,
         ]);

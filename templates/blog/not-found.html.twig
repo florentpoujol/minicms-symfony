@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog: article not found{% endblock %}
+
+{% block body %}
+<div>
+    <h1>Article not found</h1>
+
+    <p>
+        We could not find the article you request, or the article isn't published. <br>
+        <br>
+        If you are the author you can <a href="{{  path('app_login') }}">login</a> to preview your article while they are not yet published. <br>
+        <br>
+        <a href="{{  path('app_home') }}">Go back to the blog</a>
+    </p>
+</div>
+{% endblock %}

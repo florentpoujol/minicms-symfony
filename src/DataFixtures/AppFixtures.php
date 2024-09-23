@@ -70,15 +70,14 @@ final class AppFixtures extends Fixture
         $article->setTitle('my first article');
         $article->setSlug('my-first-article');
         $article->setContent(<<<TXT
+        the first article content
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in efficitur enim. Suspendisse vitae enim in dui ornare sollicitudin. Pellentesque nisl felis, tempor vel urna sit amet, tempor blandit ligula. Sed elementum faucibus vehicula. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus ornare pretium tellus, vitae sollicitudin nisi tincidunt sed. Aliquam iaculis, arcu sed tincidunt fermentum, mauris ligula tincidunt sem, ac aliquet felis ligula eu ante. Nulla non placerat dolor. Pellentesque pulvinar, orci eget pulvinar scelerisque, libero ipsum rhoncus sapien, eget lobortis quam turpis eu nisi. Nunc ante urna, consequat ornare malesuada eget, ultrices nec arcu. Nunc suscipit ac augue ac sagittis. Nunc feugiat tempus nunc vel ornare. Vestibulum elementum eros id dui lacinia faucibus. Suspendisse pellentesque massa sed justo fringilla, ac convallis quam sodales. Aliquam interdum eleifend suscipit. Vivamus molestie rhoncus mauris, ut elementum nisl.
 
         Suspendisse potenti. Nam pretium augue id nunc convallis dapibus. Aenean finibus tristique ante at volutpat. Mauris vehicula feugiat pulvinar. Aliquam nec eros quis augue faucibus commodo at quis odio. Curabitur sed accumsan eros. Aenean eleifend porta nulla sed porta.
-
-        Cras rhoncus, arcu in eleifend accumsan, est neque rutrum odio, id commodo turpis ante eget quam. Suspendisse posuere bibendum lacus sit amet pharetra. Nunc a magna massa. Vivamus pulvinar eget magna non auctor. Nunc a dolor vitae purus pharetra facilisis non et tortor. Nulla sed aliquet justo, non ornare elit. Mauris ornare, magna vitae facilisis lobortis, felis velit fermentum neque, nec venenatis nisl eros eget enim. Maecenas fermentum mauris quis velit dapibus, sit amet tincidunt est condimentum. Mauris euismod eros vel ante feugiat, sit amet molestie eros rutrum. Etiam condimentum eros massa, sed ullamcorper leo elementum id. Ut eget gravida purus. Donec vitae velit eleifend dolor vulputate semper. Morbi non tristique dolor. Vestibulum ut mollis sem. Curabitur varius consequat lectus eu accumsan.
         TXT);
-        $article->setPublishedAt($now);
-        $article->setCreatedAt($now);
-        $article->setUpdatedAt($now);
+        $article->setPublishedAt($now->modify('- 1 hour'));
+        $article->setCreatedAt($now->modify('- 1 hour'));
+        $article->setUpdatedAt($now->modify('- 1 hour'));
         $article->setUser($writer);
         $this->manager->persist($article);
 
@@ -86,11 +85,21 @@ final class AppFixtures extends Fixture
         $article->setTitle('my other article');
         $article->setSlug('my-other-article');
         $article->setContent(<<<TXT
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in efficitur enim. Suspendisse vitae enim in dui ornare sollicitudin. Pellentesque nisl felis, tempor vel urna sit amet, tempor blandit ligula. Sed elementum faucibus vehicula. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus ornare pretium tellus, vitae sollicitudin nisi tincidunt sed. Aliquam iaculis, arcu sed tincidunt fermentum, mauris ligula tincidunt sem, ac aliquet felis ligula eu ante. Nulla non placerat dolor. Pellentesque pulvinar, orci eget pulvinar scelerisque, libero ipsum rhoncus sapien, eget lobortis quam turpis eu nisi. Nunc ante urna, consequat ornare malesuada eget, ultrices nec arcu. Nunc suscipit ac augue ac sagittis. Nunc feugiat tempus nunc vel ornare. Vestibulum elementum eros id dui lacinia faucibus. Suspendisse pellentesque massa sed justo fringilla, ac convallis quam sodales. Aliquam interdum eleifend suscipit. Vivamus molestie rhoncus mauris, ut elementum nisl.
-
-        Suspendisse potenti. Nam pretium augue id nunc convallis dapibus. Aenean finibus tristique ante at volutpat. Mauris vehicula feugiat pulvinar. Aliquam nec eros quis augue faucibus commodo at quis odio. Curabitur sed accumsan eros. Aenean eleifend porta nulla sed porta.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         TXT);
-        $article->setPublishedAt($now->modify('+ 1 day'));
+        $article->setPublishedAt($now); // should be displayed first, before the "first article" added above
+        $article->setCreatedAt($now);
+        $article->setUpdatedAt($now);
+        $article->setUser($writer);
+        $this->manager->persist($article);
+
+        $article = new Article();
+            $article->setTitle('my article in the future');
+        $article->setSlug('my-article-in-the-future');
+        $article->setContent(<<<TXT
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus in efficitur enim. Suspendisse vitae enim in dui ornare sollicitudin. Pellentesque nisl felis, tempor vel urna sit amet, tempor blandit ligula. Sed elementum faucibus vehicula. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Phasellus ornare pretium tellus, vitae sollicitudin nisi tincidunt sed. Aliquam iaculis, arcu sed tincidunt fermentum, mauris ligula tincidunt sem, ac aliquet felis ligula eu ante. Nulla non placerat dolor. Pellentesque pulvinar, orci eget pulvinar scelerisque, libero ipsum rhoncus sapien, eget lobortis quam turpis eu nisi. Nunc ante urna, consequat ornare malesuada eget, ultrices nec arcu. Nunc suscipit ac augue ac sagittis. Nunc feugiat tempus nunc vel ornare. Vestibulum elementum eros id dui lacinia faucibus. Suspendisse pellentesque massa sed justo fringilla, ac convallis quam sodales. Aliquam interdum eleifend suscipit. Vivamus molestie rhoncus mauris, ut elementum nisl.
+        TXT);
+        $article->setPublishedAt($now->modify('+ 99 years')); // published in the future, must not be displayed
         $article->setCreatedAt($now->modify('+ 1 day'));
         $article->setUpdatedAt($now->modify('+ 1 day'));
         $article->setUser($writer);

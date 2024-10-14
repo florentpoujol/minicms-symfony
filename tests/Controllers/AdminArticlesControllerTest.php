@@ -9,6 +9,7 @@ use App\Repository\ArticleRepository;
 use App\Repository\UserRepository;
 use Closure;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,9 +95,8 @@ final class AdminArticlesControllerTest extends WebTestCase
         yield 'admin' => [fn (): User => self::$admin];
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $userProvider
      */
     public function testWeCanSeeTheCreationForm(Closure $userProvider): void
@@ -144,7 +144,7 @@ final class AdminArticlesControllerTest extends WebTestCase
         self::assertSame('The New Test Title', $newArticle->getTitle());
         self::assertSame('the-new-test-title', $newArticle->getSlug());
         self::assertSame('the new test content', $newArticle->getContent());
-        self::assertSame(false, $newArticle->isAllowComments());
+        self::assertFalse($newArticle->isAllowComments());
         self::assertSame('2024-10-14 15:53:00', $newArticle->getPublishedAt()?->format('Y-m-d H:i:s'));
     }
 

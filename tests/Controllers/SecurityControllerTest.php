@@ -5,6 +5,7 @@ namespace App\Tests\Controllers ;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Closure;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,7 @@ final class SecurityControllerTest extends WebTestCase
     /**
      * @return array<string, list<Closure(): User|string>>
      */
-    public function getAllUsers(): array
+    public static function getAllUsers(): array
     {
         return [
             'user' => [fn (): User => self::$user, 'user'],
@@ -53,9 +54,8 @@ final class SecurityControllerTest extends WebTestCase
         self::assertResponseRedirects('/login');
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $userReturner
      */
     public function testUsersCanAccessProfile(Closure $userReturner): void
@@ -68,14 +68,14 @@ final class SecurityControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $userReturner
      */
     public function testUserCanAccessAdminOrNot(Closure $userReturner): void
     {
         $user = $userReturner();
+        \assert($user instanceof User);
 
         // act
         $this->client->loginUser($user);
@@ -89,15 +89,15 @@ final class SecurityControllerTest extends WebTestCase
         }
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $userReturner
      */
     public function testUserHasRole(Closure $userReturner): void
     {
         // arrange
         $user = $userReturner();
+        \assert($user instanceof User);
 
         // act
         $this->client->loginUser($user);
@@ -122,37 +122,40 @@ final class SecurityControllerTest extends WebTestCase
 
     // --------------------------------------------------
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $getUser
      */
     public function testRegisterWhenLoggedInRedirectsToProfile(Closure $getUser): void
     {
+        $user = $getUser();
+        \assert($user instanceof User);
+
         $this->client
-            ->loginUser($getUser())
+            ->loginUser($user)
             ->request(Request::METHOD_GET, '/register');
 
         self::assertResponseRedirects('/profile');
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $getUser
      */
     public function testLoginWhenLoggedInRedirectsToProfile(Closure $getUser): void
     {
+        $user = $getUser();
+        \assert($user instanceof User);
+
         $this->client
-            ->loginUser($getUser())
+            ->loginUser($user)
             ->request(Request::METHOD_GET, '/login');
 
         self::assertResponseRedirects('/profile');
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $getUser
      */
     public function testLogoutRedirectsToHome(Closure $getUser): void
@@ -164,9 +167,8 @@ final class SecurityControllerTest extends WebTestCase
         self::assertResponseRedirects('/');
     }
 
+    #[DataProvider('getAllUsers')]
     /**
-     * @dataProvider getAllUsers
-     *
      * @param Closure(): User $getUser
      */
     public function testVerifyEmailRedirectsToHome(Closure $getUser): void

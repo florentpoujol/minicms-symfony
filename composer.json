@@ -105,7 +105,7 @@
         "rector-check": "@rector-fix --dry-run",
         "style-fix": "php ./tools/vendor/bin/php-cs-fixer fix -vvv --ansi",
         "style-check": "@style-fix --dry-run --diff",
-        "type-check": "php ./tools/vendor/bin/phpstan --ansi",
+        "type-check": "php ./tools/vendor/bin/phpstan --ansi --memory-limit=2G",
         "tests": "php bin/phpunit",
         "fix": [
             "@rector-fix",

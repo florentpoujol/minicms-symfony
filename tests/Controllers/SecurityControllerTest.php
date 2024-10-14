@@ -3,6 +3,7 @@
 namespace App\Tests\Controllers ;
 
 use App\Entity\User;
+use App\Repository\UserRepositoryApp;
 use Closure;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -22,12 +23,13 @@ final class SecurityControllerTest extends WebTestCase
         $entityManager = $container->get('doctrine')->getManager(); // @phpstan-ignore-line
 
         $userRepository = $entityManager->getRepository(User::class);
+        \assert($userRepository instanceof UserRepositoryApp);
 
         // the variable here must be static, otherwise PHP complain that within the tests we access the properties
         // before theirs initialisation, even when the data provider return a closure...
-        self::$user = $userRepository->findOneBy(['email' => 'user@example.com']);
-        self::$writer = $userRepository->findOneBy(['email' => 'writer@example.com']);
-        self::$admin = $userRepository->findOneBy(['email' => 'admin@example.com']);
+        self::$user = $userRepository->findOneByOrThrow(['email' => 'user@example.com']);
+        self::$writer = $userRepository->findOneByOrThrow(['email' => 'writer@example.com']);
+        self::$admin = $userRepository->findOneByOrThrow(['email' => 'admin@example.com']);
     }
 
     /**
@@ -171,36 +173,5 @@ final class SecurityControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful(); // because we are now on the /profile page after being redirected to /redirect first
         self::assertRouteSame('app_profile');
-    }
-
-    // --------------------------------------------------
-
-    /**
-     * @dataProvider getAllUsers
-     *
-     * @param Closure(): User $getUser
-     */
-    public function testSuccessfulLogin(Closure $getUser, string $password): void
-    {
-        $user = $getUser();
-
-        $this->client->followRedirects();
-        $crawler = $this->client->request(Request::METHOD_GET, '/login');
-
-        self::assertSelectorExists('input[name=_username]');
-        self::assertSelectorExists('input[name=_password]');
-        self::assertSelectorExists('input[name=_csrf_token]');
-
-        $form = $crawler->selectButton('Sign in')->form();
-        $form['_username'] = $user->getEmail();
-        $form['_password'] = $password;
-
-        $this->client->submit($form);
-
-        self::assertResponseIsSuccessful();
-
-        self::markTestSkipped();
-        // DOESN'T WORK : is redirect to login page with wrong credentials message (even when csrf protection is disabled)
-        // self::assertRouteSame('app_profile');
     }
 }

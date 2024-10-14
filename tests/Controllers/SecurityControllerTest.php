@@ -20,7 +20,7 @@ final class SecurityControllerTest extends WebTestCase
     {
         $this->client = self::createClient();
         $container = self::getContainer();
-        $entityManager = $container->get('doctrine')->getManager(); // @phpstan-ignore-line
+        $entityManager = $container->get('doctrine')->getManager();
 
         $userRepository = $entityManager->getRepository(User::class);
         \assert($userRepository instanceof UserRepositoryApp);

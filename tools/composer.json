@@ -4,6 +4,7 @@
         "phpstan/phpstan": "^1.11",
         "phpstan/phpstan-strict-rules": "^1.6",
         "rector/rector": "^1.2",
-        "rector/type-perfect": "^1.0"
+        "rector/type-perfect": "^1.0",
+        "phpstan/phpstan-symfony": "^1.4"
     }
 }

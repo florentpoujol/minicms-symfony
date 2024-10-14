@@ -1,6 +1,8 @@
 includes:
     - tools/vendor/phpstan/phpstan-strict-rules/rules.neon
     - tools/vendor/rector/type-perfect/config/extension.neon
+    - tools/vendor/phpstan/phpstan-symfony/extension.neon
+    - tools/vendor/phpstan/phpstan-symfony/rules.neon
 
 parameters:
     level: max
@@ -9,12 +11,17 @@ parameters:
         - src
         - tests
 
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+
     type_perfect:
         no_mixed_property: true
         no_mixed_caller: true
         null_over_false: true
         narrow_param: true
         narrow_return: true
+
+
 
 #    excludePaths:
 #        - tests/...

@@ -22,7 +22,7 @@ final class BlogControllerTest extends WebTestCase
         $this->client = self::createClient();
 
         /** @var EntityManagerInterface $entityManager */
-        $entityManager = self::getContainer()->get('doctrine')->getManager(); // @phpstan-ignore-line
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
 
         $userRepository = $entityManager->getRepository(User::class);
         $user = $userRepository->findOneBy(['email' => 'writer@example.com']);

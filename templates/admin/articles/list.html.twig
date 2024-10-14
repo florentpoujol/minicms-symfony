@@ -38,8 +38,16 @@
             <td>{{ article.title }}</td>
             <td>{{ article.slug }}</td>
             <td>{{ article.content | strlen }} chars</td>
-            <td>{{ article.allowComments }}</td>
-            <td>{{ article.publishedAt ? article.publishedAt | format_datetime('short', locale: 'fr') : 'Draft' }}</td>
+            <td>{{ article.allowComments ? 'Yes' : 'No' }}</td>
+            <td
+                    {% if article.publishedAt is not null and date(article.publishedAt) > date() %}
+                        style="background-color:orange"
+                    {% elseif article.publishedAt is not null and date(article.publishedAt) < date() %}
+                        style="background-color:lightgreen"
+                    {% endif %}
+            >
+                {{ article.publishedAt ? article.publishedAt | format_datetime('short', locale: 'fr') : 'Draft' }}
+            </td>
             <td>{{ article.createdAt | format_datetime('short', locale: 'fr') }}</td>
             <td>{{ article.updatedAt | format_datetime('short', locale: 'fr') }}</td>
             <td>

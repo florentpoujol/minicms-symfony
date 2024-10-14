@@ -1,15 +1,7 @@
 # Mini CMS - Symfony
 
-The point of this project is to practice web development with Symfony & Friends, by creating a basic CMS with the following tools:
-- Symfony 7
-- Vue.js 3
-- PHPStan at the strictest level
-- Codeception
-    
-See also, from 2018, the same kind of project but without framework, or even without any OOP:
-- [Mini CMS - Modern](https://github.com/florentpoujol/minicms-modern)
-- [Mini CMS - Old-School - Vanilla](https://github.com/florentpoujol/minicms-osv)
-  
+The point of this project is to practice web development with Symfony & Friends, by creating a basic CMS.
+
 ## General features
 
 ### Users
@@ -22,9 +14,8 @@ See also, from 2018, the same kind of project but without framework, or even wit
 - [X] Standard login via username and password
 - [ ] forgot password function that sends an email to the user allowing him to access the form to reset the password within 48h
 - [X] commenters can only edit their profile
-- [ ] writers can see all existing users and edit their profile
 - [ ] admins can see/edit/delete all users
-- [ ] users can't delete themselves
+- [X] users can't delete themselves
 - [ ] admin can ban users
 - [ ] deleting a user deletes all its comments, reaffects its posts and uploads to the user that deleted it
 
@@ -36,9 +27,9 @@ See also, from 2018, the same kind of project but without framework, or even wit
 
 - [ ] standard posts linked to categories
 - [ ] content is markdown
-- [ ] only created by admin or writers
+- [X] only created by admin or writers
 - [ ] can have comments (comments can be turned off on a per-post basis)
-- [ ] the blog page show the X last posts
+- [X] the blog page show the X last posts
 - [ ] the blog page show the last posts with a list of the categories in a sidebar
 
 ### Pages

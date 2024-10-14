@@ -58,8 +58,13 @@ final class AppFixtures extends Fixture
         $user->setCreatedAt($now);
         $user->setUpdatedAt($now);
         $this->manager->persist($user);
+
+        $this->setReference('admin', $user);
     }
 
+    /**
+     * All articles are written by the "writer" user except for the last one, that is written by the admin.
+     */
     private function loadArticles(): void
     {
         $now = new \DateTimeImmutable();
@@ -75,7 +80,7 @@ final class AppFixtures extends Fixture
 
         Suspendisse potenti. Nam pretium augue id nunc convallis dapibus. Aenean finibus tristique ante at volutpat. Mauris vehicula feugiat pulvinar. Aliquam nec eros quis augue faucibus commodo at quis odio. Curabitur sed accumsan eros. Aenean eleifend porta nulla sed porta.
         TXT);
-        $article->setPublishedAt($now->modify('- 1 hour'));
+        $article->setPublishedAt(new \DateTimeImmutable('2024-09-23 13:14:03'));
         $article->setCreatedAt($now->modify('- 1 hour'));
         $article->setUpdatedAt($now->modify('- 1 hour'));
         $article->setUser($writer);
@@ -114,7 +119,11 @@ final class AppFixtures extends Fixture
         $article->setPublishedAt(null);
         $article->setCreatedAt($now);
         $article->setUpdatedAt($now);
-        $article->setUser($writer);
+
+        $admin = $this->getReference('admin');
+        \assert($admin instanceof User);
+
+        $article->setUser($admin);
         $this->manager->persist($article);
     }
 }

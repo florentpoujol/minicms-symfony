@@ -51,9 +51,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'user')]
     private Collection $articles;
 
+    /**
+     * @var Collection<int, AuditLog>
+     */
+    #[ORM\OneToMany(targetEntity: AuditLog::class, mappedBy: 'user')]
+    private Collection $auditLogs;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection();
+        $this->auditLogs = new ArrayCollection();
     }
 
     public function getId(): int
@@ -204,5 +211,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isAdmin(): bool
     {
         return \in_array('ROLE_ADMIN', $this->getRoles(), true);
+    }
+
+    /**
+     * @return Collection<int, AuditLog>
+     */
+    public function getAuditLogs(): Collection
+    {
+        return $this->auditLogs;
+    }
+
+    public function addAuditLog(AuditLog $auditLog): static
+    {
+        if (!$this->auditLogs->contains($auditLog)) {
+            $this->auditLogs->add($auditLog);
+            $auditLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuditLog(AuditLog $auditLog): static
+    {
+        if ($this->auditLogs->removeElement($auditLog)) {
+            // set the owning side to null (unless already changed)
+            if ($auditLog->getUser() === $this) {
+                $auditLog->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

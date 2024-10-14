@@ -52,7 +52,7 @@ final class ArticleRepository extends ServiceEntityRepository
     /**
      * @return array<Article>
      */
-    public function getAllForAdmin(User $user): array
+    public function getAllForAdminSection(User $user): array
     {
         $builder = $this->createQueryBuilder('a')
             ->addSelect('u')

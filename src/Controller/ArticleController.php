@@ -34,7 +34,7 @@ final class ArticleController extends AbstractController
         $this->twig->addFilter(new TwigFilter('strlen', 'strlen'));
 
         return $this->render('admin/articles/list.html.twig', [
-            'articles' => $this->articleRepository->getAllForAdmin($user),
+            'articles' => $this->articleRepository->getAllForAdminSection($user),
         ]);
     }
 

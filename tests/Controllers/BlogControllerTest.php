@@ -59,11 +59,14 @@ final class BlogControllerTest extends WebTestCase
 
     public function testWeCanSeeAnArticlePageWhenPublished(): void
     {
+        // arrange
         $article = $this->articleRepository->findOneBy(['slug' => 'my-first-article']);
         self::assertInstanceOf(Article::class, $article);
 
+        // act
         $this->client->request(Request::METHOD_GET, '/blog/' . $article->getSlug());
 
+        // assert
         self::assertResponseIsSuccessful();
 
         self::assertAnySelectorTextContains('h1', $article->getTitle());
@@ -75,22 +78,28 @@ final class BlogControllerTest extends WebTestCase
 
     public function testGuestCantSeeArticleWhenDraft(): void
     {
+        // arrange
         $article = $this->articleRepository->findOneBy(['slug' => 'my-draft-article']);
         self::assertInstanceOf(Article::class, $article);
 
+        // act
         $this->client->request(Request::METHOD_GET, '/blog/' . $article->getSlug());
 
+        // assert
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
     public function testAnAuthorCanSeeTheirArticlePageEvenWhenNotPublished(): void
     {
+        // arrange
         $article = $this->articleRepository->findOneBy(['slug' => 'my-draft-article']);
         self::assertInstanceOf(Article::class, $article);
 
+        // act
         $this->client->loginUser($this->writer);
         $this->client->request(Request::METHOD_GET, '/blog/' . $article->getSlug());
 
+        // assert
         self::assertResponseIsSuccessful();
 
         self::assertAnySelectorTextContains('h1', $article->getTitle());

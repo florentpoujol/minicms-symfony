@@ -3,7 +3,7 @@
 namespace App\Tests\Controllers ;
 
 use App\Entity\User;
-use App\Repository\UserRepositoryApp;
+use App\Repository\UserRepository;
 use Closure;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -23,7 +23,7 @@ final class SecurityControllerTest extends WebTestCase
         $entityManager = $container->get('doctrine')->getManager();
 
         $userRepository = $entityManager->getRepository(User::class);
-        \assert($userRepository instanceof UserRepositoryApp);
+        \assert($userRepository instanceof UserRepository);
 
         // the variable here must be static, otherwise PHP complain that within the tests we access the properties
         // before theirs initialisation, even when the data provider return a closure...
@@ -77,9 +77,11 @@ final class SecurityControllerTest extends WebTestCase
     {
         $user = $userReturner();
 
+        // act
         $this->client->loginUser($user);
         $this->client->request(Request::METHOD_GET, '/admin');
 
+        // assert
         if ($user->getEmail() === 'user@example.com') {
             self::assertResponseStatusCodeSame(403);
         } else {
@@ -94,11 +96,14 @@ final class SecurityControllerTest extends WebTestCase
      */
     public function testUserHasRole(Closure $userReturner): void
     {
+        // arrange
         $user = $userReturner();
 
+        // act
         $this->client->loginUser($user);
         $this->client->request(Request::METHOD_GET, '/');
 
+        // assert
         $roles = $user->getRoles();
 
         // for every one because always added by Symfony

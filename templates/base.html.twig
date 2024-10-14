@@ -12,6 +12,22 @@
         {% endblock %}
     </head>
     <body>
+        <nav>
+            <ul>
+                {% if app.user is null %}
+                <li><a href="{{ path('app_register') }}">Register</a></li>
+                <li><a href="{{ path('app_login') }}">Login</a></li>
+                {% else %}
+                <li><a href="{{ path('app_profile') }}">Profile</a></li>
+                <li><a href="{{ path('app_logout') }}">Logout</a></li>
+                {% endif %}
+
+                {% if is_granted("ROLE_WRITER") %}
+                <li><a href="{{ path('admin_dashboard') }}">Admin</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+
         {% block body %}{% endblock %}
     </body>
 </html>

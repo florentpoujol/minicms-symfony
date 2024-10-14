@@ -114,27 +114,65 @@ final class AdminArticlesControllerTest extends WebTestCase
         ->count());
     }
 
-    /**
-     * @dataProvider getAllUsers
-     *
-     * @param Closure(): User $userProvider
-     */
-    public function testTheEditFormFillsProperly(Closure $userProvider): void
+    public function testWeCanCreateANewArticle(): void
     {
         // arrange
-        $firstWriterArticle = $this->articleRepository->getAllForAdminSection(self::$writer)[0] ?? null;
-        \assert($firstWriterArticle instanceof Article);
+        $newArticle = $this->articleRepository->findOneBy(['slug' => 'the-new-test-title']);
+        self::assertNull($newArticle);
+
+        // act
+        $crawler = $this->client
+            ->loginUser(self::$writer)
+            ->request(Request::METHOD_GET, '/admin/articles/create');
+
+        $form = $crawler
+            ->selectButton('article_form_save')
+            ->form();
+
+        $form->setValues([
+            'article_form[title]' => 'The New Test Title',
+            'article_form[content]' => 'the new test content',
+            // 'article_form[allow_comments]' => '0',
+            'article_form[published_at]' => '2024-10-14T15:53',
+        ]);
+        $this->client->submit($form);
+
+        // assert
+        $newArticle = $this->articleRepository->findOneBy(['slug' => 'the-new-test-title']);
+        self::assertInstanceOf(Article::class, $newArticle);
+
+        self::assertSame('The New Test Title', $newArticle->getTitle());
+        self::assertSame('the-new-test-title', $newArticle->getSlug());
+        self::assertSame('the new test content', $newArticle->getContent());
+        self::assertSame(false, $newArticle->isAllowComments());
+        self::assertSame('2024-10-14 15:53:00', $newArticle->getPublishedAt()?->format('Y-m-d H:i:s'));
+    }
+
+    public function testTheEditFormFillsProperly(): void
+    {
+        // arrange
+        $article = $this->articleRepository->getAllForAdminSection(self::$writer)[0] ?? null;
+        \assert($article instanceof Article);
 
         // act
         $crawler = $this->client
             ->loginUser(self::$admin)
-            ->request(Request::METHOD_GET, '/admin/articles/' . $firstWriterArticle->getSlug() . '/edit');
+            ->request(Request::METHOD_GET, '/admin/articles/' . $article->getSlug() . '/edit');
 
         // assert
         self::assertResponseIsSuccessful();
         self::assertRouteSame('admin_articles_edit');
 
-        self::assertSame(1, $crawler->filter('#article_form')
-            ->count());
+        $value = $crawler->filter('#article_form_title')->attr('value');
+        self::assertSame($article->getTitle(), $value);
+
+        $value = $crawler->filter('#article_form_content');
+        self::assertSame($article->getContent(), $value->text());
+
+        $value = $crawler->filter('#article_form_allow_comments')->attr('value');
+        self::assertSame($article->isAllowComments(), (bool) $value);
+
+        $value = $crawler->filter('#article_form_published_at')->attr('value');
+        self::assertSame($article->getPublishedAt()?->format('Y-m-d\TH:i'), $value);
     }
 }

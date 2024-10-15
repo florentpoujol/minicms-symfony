@@ -22,9 +22,9 @@ class AuditLog
 
     #[ORM\Column]
     /**
-     * @var array{before?: array<mixed>, after?: array<mixed>}
+     * @var array{before?: array<string, mixed>, after?: array<string, mixed>} $data
      */
-    private array $data = [];
+    private array $data = []; // @phpstan-ignore-line (still gives the "...  no value type specified ..." error)
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -62,7 +62,7 @@ class AuditLog
     }
 
     /**
-     * @return array{before?: array<mixed>, after?: array<mixed>}
+     * @return array{before?: array<string, mixed>, after?: array<string, mixed>}
      */
     public function getData(): array
     {
@@ -70,7 +70,7 @@ class AuditLog
     }
 
     /**
-     * @param array{before?: array<mixed>, after?: array<mixed>} $data
+     * @param array{before?: array<string, mixed>, after?: array<string, mixed>} $data
      */
     public function setData(array $data): static
     {

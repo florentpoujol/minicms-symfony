@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -49,12 +50,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Article>
      */
     #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'user')]
+    #[Ignore]
     private Collection $articles;
 
     /**
      * @var Collection<int, AuditLog>
      */
     #[ORM\OneToMany(targetEntity: AuditLog::class, mappedBy: 'user')]
+    #[Ignore]
     private Collection $auditLogs;
 
     public function __construct()

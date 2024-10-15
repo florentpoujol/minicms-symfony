@@ -16,11 +16,17 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsDoctrineListener(event: Events::postPersist, priority: 500, connection: 'default')]
 #[AsDoctrineListener(event: Events::postUpdate, priority: 500, connection: 'default')]
 #[AsDoctrineListener(event: Events::postRemove, priority: 500, connection: 'default')]
+/**
+ * TODO:
+ * - for one to many relation ship, only save the identifier, not the whole object
+ * - ideally do not save other relationships without the Ignore attribute on theses
+ * - save properties for before / after
+ * - for the article > user relationship, see why all properties + getters are serialized, which doesn't happen for the article
+ */
 final class AuditLogListener
 {
     /**
@@ -107,7 +113,8 @@ final class AuditLogListener
 
         // remove sensitive properties ? (maybe done by the serializer)
 
-        $log->setData($data);
+        $log->setData($data); // @phpstan-ignore-line
+        $log->setCreatedAt(new \DateTimeImmutable());
 
         $this->entityManager->persist($log);
         $this->entityManager->flush();

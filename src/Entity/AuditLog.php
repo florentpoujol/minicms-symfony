@@ -102,4 +102,65 @@ class AuditLog
 
         return $this;
     }
+
+    //--------------------------------------------------
+
+    /**
+     * @var array<int, class-string>
+     */
+    private static array $morphMap = [
+        1 => User::class,
+        2 => Article::class,
+    ];
+
+    #[ORM\Column]
+    private int $entity_id;
+
+    #[ORM\Column(type: 'smallint')]
+    private int $entity_type;
+
+    public function getEntityId(): int
+    {
+        return  $this->entity_id;
+    }
+
+    public function getEntityType(): int
+    {
+        return  $this->entity_type;
+    }
+
+    /**
+     * @return class-string
+     */
+    public function getEntityFqcn(): string
+    {
+        return self::$morphMap[$this->entity_type];
+    }
+
+    public static function getTypeForEntity(string $entityFqcn): int
+    {
+        $typeId = array_search($entityFqcn, self::$morphMap, true);
+        if (!\is_int($typeId)) {
+            throw new \UnexpectedValueException("No type id found for class '$entityFqcn'");
+        }
+
+        return $typeId;
+    }
+
+    public function setEntity(object $entity): void
+    {
+        $entityFqcn = $entity::class;
+        $this->entity_type =  self::getTypeForEntity($entityFqcn);
+
+        if (!method_exists($entity, 'getId')) {
+            throw new \UnexpectedValueException("No method getId() found on class '$entityFqcn'");
+        }
+
+        $entityId = $entity->getId();
+        if ($entityId === null) {
+            throw new \UnexpectedValueException("Entity of type '$entityFqcn' has no id defined");
+        }
+
+        $this->entity_id = $entityId;
+    }
 }

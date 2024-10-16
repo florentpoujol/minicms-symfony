@@ -40,10 +40,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
-    #[ORM\Column(updatable: false, options: ['default' => 'current_timestamp'])]
+    #[ORM\Column(updatable: false, columnDefinition: "DATETIME not null default current_timestamp")]
     private \DateTimeImmutable $created_at;
 
-    #[ORM\Column(columnDefinition: "DATETIME default current_timestamp on update current_timestamp")]
+    #[ORM\Column(columnDefinition: "DATETIME not null default current_timestamp on update current_timestamp")]
     private \DateTimeImmutable $updated_at;
 
     /**

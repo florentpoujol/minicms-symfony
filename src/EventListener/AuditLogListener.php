@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Entity\AuditLog;
 use App\Entity\User;
 use App\Enums\AuditLogAction;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -128,19 +129,24 @@ final class AuditLogListener
         // $this->entityManager->persist($log);
         // $this->entityManager->flush();
 
+        $log = new AuditLog();
+        $log->setEntity($entity);
+
         // So instead, we are saving the lof "manually"
         $this->entityManager
             ->getConnection()
             ->executeQuery(<<<SQL
-                insert into audit_log (user_id, action, context, data, created_at)
-                values (:user_id, :action, :context, :data, :created_at)
+                insert into audit_log (user_id, action, context, data, created_at, entity_id, entity_type)
+                values (:user_id, :action, :context, :data, :created_at, :entity_id, :entity_type)
                 SQL,
                 [
                     'user_id' => $user?->getId(),
                     'action' => $action->value,
                     'context' => $context,
                     'data' => json_encode($data),
-                    'created_at' => date(\DateTimeImmutable::ATOM),
+                    'created_at' => (new DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+                    'entity_id' => $log->getEntityId(),
+                    'entity_type' => $log->getEntityType(),
                 ],
             );
     }

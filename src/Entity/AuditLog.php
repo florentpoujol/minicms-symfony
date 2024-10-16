@@ -2,31 +2,31 @@
 
 namespace App\Entity;
 
+use App\Enums\AuditLogAction;
 use App\Repository\AuditLogRepository;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Enums\AuditLogAction;
 
 #[ORM\Entity(repositoryClass: AuditLogRepository::class)]
 class AuditLog
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'bigint')]
     private ?int $id = null;
 
     #[ORM\Column(enumType: AuditLogAction::class)]
     private ?AuditLogAction $action = null;
 
-    #[ORM\Column(length: 65_635)]
-    private ?string $context = null;
+    #[ORM\Column(length: 1_000)]
+    private string $context = '';
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'json')]
     /**
      * @var array{before?: array<string, mixed>, after?: array<string, mixed>} $data
      */
     private array $data = []; // @phpstan-ignore-line (still gives the "...  no value type specified ..." error)
 
-    #[ORM\Column]
+    #[ORM\Column(updatable: false, columnDefinition: "TIMESTAMP(2) default current_timestamp")]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'auditLogs')]
@@ -49,7 +49,7 @@ class AuditLog
         return $this;
     }
 
-    public function getContext(): ?string
+    public function getContext(): string
     {
         return $this->context;
     }

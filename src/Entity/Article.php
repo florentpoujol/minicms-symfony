@@ -39,10 +39,10 @@ class Article
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $published_at = null;
 
-    #[ORM\Column]
+    #[ORM\Column(updatable: false, options: ['default' => 'current_timestamp'])]
     private \DateTimeImmutable $created_at;
 
-    #[ORM\Column]
+    #[ORM\Column(columnDefinition: "DATETIME default current_timestamp on update current_timestamp")]
     private \DateTimeImmutable $updated_at;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]

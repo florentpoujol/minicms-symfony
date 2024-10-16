@@ -43,7 +43,6 @@ final class AuditLogListener
         private readonly RequestStack $requestStack,
         private readonly NormalizerInterface $normalizer,
         private readonly EntityManagerInterface $entityManager,
-        private readonly LoggerInterface $logger,
     )
     {
     }
@@ -73,36 +72,28 @@ final class AuditLogListener
      */
     private function saveLog(LifecycleEventArgs $event, AuditLogAction $action): void
     {
-        static $i;
-        $i++;
         $entity = $event->getObject();
-        $this->logger->info($entity::class, ['i' => $i]); // doesn't work ?
-
         if (\in_array($entity::class, $this->ignoredEntities, true)) {
             return;
         }
 
-        $log = new AuditLog();
-        // $log->model()->associate($model);
-        $log->setAction($action);
-        $log->setContext('{unknown}');
-        $log->setCreatedAt(new \DateTimeImmutable());
-
+        $context = '{unknown}';
+        $user = null;
         if (\PHP_SAPI === 'cli') {
             // get the full actual CLI command entered in the terminal, which gives the options and arguments
             $args = implode(' ', $_SERVER['argv'] ?? []);
-            $log->setContext("cli: ($args)");
+            $context = "cli: ($args)";
 
             // could also get the name of the current job, if possible (probably need the same shenanigans as for the Artisan command name)
         } else { // probably web
-            $user = $this->tokenStorage->getToken()->getUser(); // using the CurrentUser attribute didn't work...
-            if ($user instanceof User) {
-                $log->setUser($user);
+            $_user = $this->tokenStorage->getToken()?->getUser(); // using the CurrentUser attribute didn't work...
+            if ($_user instanceof User) {
+                $user = $_user;
             }
 
             $request = $this->requestStack->getCurrentRequest();
             if ($request instanceof Request) {
-                $log->setContext('http:' . $request->getPathInfo() . '?' . $request->getQueryString());
+                $context = 'http: ' . $request->getPathInfo() . '?' . $request->getQueryString();
             }
         }
 
@@ -115,7 +106,7 @@ final class AuditLogListener
             $data['before'] = [];
             $data['after'] = [];
 
-            assert($event instanceof PreUpdateEventArgs);
+            \assert($event instanceof PreUpdateEventArgs);
             $changeSet = $event->getEntityChangeSet();
 
             /**
@@ -126,17 +117,32 @@ final class AuditLogListener
                 $data['before'][$property] = $beforeAndAfter[0];
                 $data['after'][$property] = $beforeAndAfter[1];
             }
-
-            // FIXME florent: there is an infinite loop until out of memory
-            //  The audit_log table auto increment values show that this is due to a loop of AuditLog creation
-
         }
-        $log->setData($data); // @phpstan-ignore-line
 
         // remove sensitive properties ? (maybe done by the serializer)
         // ideally we would like to keep the sensitive properties, but redact their values
 
-        $this->entityManager->persist($log);
-        $this->entityManager->flush();
+        // Calling flush() here (inside a doctrine lifecycle event listener) is "strongly discouraged" by the doc
+        // https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/events.html#events-overview.
+        // Doing it during pre update cause an infinite loop where the method is called again and again with the same article and a new AuditLog every time.
+        // Not calling flush() however do not cause the AuditLog to be persisted.
+        // $this->entityManager->persist($log);
+        // $this->entityManager->flush();
+
+        // So instead, we are saving the lof "manually"
+        $this->entityManager
+            ->getConnection()
+            ->executeQuery(<<<SQL
+                insert into audit_log (user_id, action, context, data, created_at)
+                values (:user_id, :action, :context, :data, :created_at)
+                SQL,
+                [
+                    'user_id' => $user?->getId(),
+                    'action' => $action->value,
+                    'context' => $context,
+                    'data' => json_encode($data),
+                    'created_at' => date(\DateTimeImmutable::ATOM),
+                ],
+            );
     }
 }

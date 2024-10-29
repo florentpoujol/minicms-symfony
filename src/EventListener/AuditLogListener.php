@@ -26,7 +26,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * TODO:
  * - for one to many relation ship, only save the identifier, not the whole object
  * - ideally do not save other relationships without the Ignore attribute on theses
- * - save properties for before / after
  * - for the article > user relationship, see why all properties + getters are serialized, which doesn't happen for the article
  */
 final class AuditLogListener
@@ -82,18 +81,23 @@ final class AuditLogListener
         if (\PHP_SAPI === 'cli') {
             // get the full actual CLI command entered in the terminal, which gives the options and arguments
             $args = implode(' ', $_SERVER['argv'] ?? []);
-            $context = "cli: ($args)";
+            $context = "cli: $args";
 
             // could also get the name of the current job, if possible (probably need the same shenanigans as for the Artisan command name)
         } else { // probably web
-            $_user = $this->tokenStorage->getToken()?->getUser(); // using the CurrentUser attribute didn't work...
-            if ($_user instanceof User) {
-                $user = $_user;
+            $loggedInUser = $this->tokenStorage->getToken()?->getUser();
+            if ($loggedInUser instanceof User) {
+                $user = $loggedInUser;
             }
 
             $request = $this->requestStack->getCurrentRequest();
             if ($request instanceof Request) {
-                $context = 'http: ' . $request->getPathInfo() . '?' . $request->getQueryString();
+                $queryString = $request->getQueryString();
+                if ($queryString !== null && $queryString !== '') {
+                    $queryString = "?$queryString";
+                }
+
+                $context = 'http: ' . $request->getPathInfo() . $queryString;
             }
         }
 
@@ -132,7 +136,7 @@ final class AuditLogListener
         $log = new AuditLog();
         $log->setEntity($entity);
 
-        // So instead, we are saving the lof "manually"
+        // So instead, we are saving the log "manually"
         $this->entityManager
             ->getConnection()
             ->executeQuery(<<<SQL

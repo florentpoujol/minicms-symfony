@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Entity\AuditLog;
 use App\Entity\User;
 use App\Enums\AuditLogAction;
+use App\Serializer\Normalizer\AuditLogDataNormalizer;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +18,6 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsDoctrineListener(event: Events::postPersist, priority: 500, connection: 'default')]
 #[AsDoctrineListener(event: Events::preUpdate, priority: 500, connection: 'default')]
@@ -40,7 +40,7 @@ final class AuditLogListener
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
         private readonly RequestStack $requestStack,
-        private readonly NormalizerInterface $normalizer,
+        private readonly AuditLogDataNormalizer $normalizer,
         private readonly EntityManagerInterface $entityManager,
     )
     {
@@ -102,10 +102,11 @@ final class AuditLogListener
         }
 
         $data = [];
+        // $this->normalizer is App\Serializer\Normalizer\AuditLogDataNormalizer
         if ($action === AuditLogAction::CREATE) {
-            $data['after'] = $this->normalizer->normalize($entity, 'array');
+            $data['after'] = $this->normalizer->normalize($entity);
         } elseif ($action === AuditLogAction::DELETE) {
-            $data['before'] = $this->normalizer->normalize($entity, 'array');
+            $data['before'] = $this->normalizer->normalize($entity);
         } elseif ($action === AuditLogAction::UPDATE) {
             $data['before'] = [];
             $data['after'] = [];

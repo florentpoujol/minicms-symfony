@@ -25,3 +25,7 @@ services:
 
     App\Mail\LogTransportFactory:
         tags: ['mailer.transport_factory']
+
+    App\Serializer\Normalizer\AuditLogDataNormalizer:
+        tags: ['serializer.normalizer.auditlog']
+

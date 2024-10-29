@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Twig\Environment;
 use Twig\TwigFilter;
@@ -23,7 +22,6 @@ final class ArticleController extends AbstractController
     public function __construct(
         private readonly ArticleRepository $articleRepository,
         private readonly Environment $twig,
-        private readonly SerializerInterface $serializer,
     ) {
     }
 

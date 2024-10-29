@@ -14,7 +14,7 @@ final class AuditLogDataNormalizerTest extends KernelTestCase
     {
         parent::setUp();
 
-        self::getContainer()->get(SerializerInterface::class);
+        // self::getContainer()->get(SerializerInterface::class);
     }
 
     public function test_normalize_and_article(): void
@@ -50,14 +50,12 @@ final class AuditLogDataNormalizerTest extends KernelTestCase
         ];
 
         // act
-        /** @var AuditLogDataNormalizer $normalizer */
-        $normalizer = self::getContainer()->get('serializer.normalizer.auditlog');
+        $serializer = self::getContainer()->get(SerializerInterface::class);
+        $normalizer = new AuditLogDataNormalizer($serializer);
 
         $actualData = $normalizer->normalize($article);
 
         // assert
-        self::assertTrue($normalizer->supportsNormalization($article));
-
         self::assertSame($expectedData, $actualData);
     }
 }

@@ -5,8 +5,7 @@ namespace App\Serializer\Normalizer;
 use Doctrine\ORM\Mapping as ORM;
 use ReflectionClass;
 use ReflectionNamedType;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * This normalizer only work with Doctrine entities, and it improves on the object normalizer:
@@ -16,21 +15,23 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * Note that this normalizer is only used when creating or deleting an entity.
  */
-final readonly class AuditLogDataNormalizer implements NormalizerInterface
+final readonly class AuditLogDataNormalizer
 {
     public function __construct(
-        // this property isn't used, but for some reason I have to make sure that the Serializer is loaded in the DI container
-        // otherwise, there is an error in "vendor/symfony/serializer/Normalizer/AbstractObjectNormalizer.php:218"
-        // Symfony\Component\Serializer\Exception\LogicException: Cannot normalize attribute "createdAt" because the injected serializer is not a normalizer.
-        #[Autowire(service: 'serializer.normalizer.object')]
-        private NormalizerInterface $normalizer,
+        /**
+         * see why this is not the NormalizerInterface or the ObjectNormalizer directly
+         * @see https://github.com/symfony/symfony/discussions/58707
+         */
+        private SerializerInterface $serializer,
     ) {
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    /**
+     * @return array<string, scalar|array>
+     */
+    public function normalize(object $object): array
     {
-        \assert(\is_object($object));
-        $data = $this->normalizer->normalize($object, 'array', $context);
+        $data = $this->serializer->normalize($object, 'array');
 
         $reflClass = new ReflectionClass($object);
         foreach ($data as $key => $value) { // $value here is already the normalized value of the property/getter
@@ -85,15 +86,6 @@ final readonly class AuditLogDataNormalizer implements NormalizerInterface
         return '{not found}';
     }
 
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
-    {
-        if (!\is_object($data)) {
-            return false;
-        }
-
-        return $this->isDoctrineEntity($data);
-    }
-
     private function isDoctrineEntity(string|object $object): bool
     {
         if (is_string($object) && !class_exists($object)) {
@@ -101,10 +93,5 @@ final readonly class AuditLogDataNormalizer implements NormalizerInterface
         }
 
         return (new ReflectionClass($object))->getAttributes(ORM\Entity::class) !== [];
-    }
-
-    public function getSupportedTypes(?string $format): array
-    {
-        return ['object' => true];
     }
 }

@@ -1,59 +1,59 @@
 # Mini CMS - Symfony
 
-The point of this project is to practice web development with Symfony & Friends, by creating a basic CMS.
+The point of this project is both to practice and showcase my capabilities in web development with Symfony & Friends, by creating a basic CMS.
 
-## General features
+## Current application features
 
-### Users
+- User entity with built-in registration/login/logout
+- 3 roles: regular user, that can only post comments on articles, writers, that write/edit their articles and admins that can do every thing
+- access to a "profile" (currently almost empty) (at `/profile`) for all logged-in users
+- access to an admin section for the writers and admins with a list of articles (at `/admin/articles`)
+- a form to create or edit an article (at `/admin/articles/create` and `/admin/articles/{slug}/edit`)
+- a blog page that displays the currently published articles, with an excerpt of their content (at `/blog`)
+- a page to display a single article (at `/blog/{slug}`), writers and admins can see non-published articles
+- an "AuditLog", a database entity that track changes to other entities
 
-- [X] 3 roles: admin, writer, commenter
-- [X] registering of new users via a public form or by admins
-    - [ ] by admins
-- [X] emails of new users must be validated via a link sent to their address
-- [ ] registering can be turned off globally
-- [X] Standard login via username and password
-- [ ] forgot password function that sends an email to the user allowing him to access the form to reset the password within 48h
-- [X] commenters can only edit their profile
-- [ ] admins can see/edit/delete all users
-- [X] users can't delete themselves
-- [ ] admin can ban users
-- [ ] deleting a user deletes all its comments, reaffects its posts and uploads to the user that deleted it
+### Used Symfony features/components
 
-### Medias
+- Router + Controller + Twig views
+- Built-in User authentication
+- Forms
+- Application tests
+- Doctrine 
+  - entities with relations + repositories
+  - entities lifecycle events
+  - Fixtures
 
-- [ ] upload and deletion of media (images, zip, pdf)
+## Setup
 
-### Posts and categories
+You must have Docker and Docker Compose installed locally.
 
-- [ ] standard posts linked to categories
-- [ ] content is markdown
-- [X] only created by admin or writers
-- [ ] can have comments (comments can be turned off on a per-post basis)
-- [X] the blog page show the X last posts
-- [ ] the blog page show the last posts with a list of the categories in a sidebar
+- build the docker image with `docker compose build`
+- the stack will use the port `8080` by default. If you need another port, you can set it with an `APP_PORT` env var in your `.env` file
+- up the stack with `docker compose up -d`
+- then install the composer dependencies via a container `./docker/composer install`
 
-### Pages
+### Run the tests
 
-- [ ] content is markdown
-- [ ] only created by admin or writers
-- [ ] can have comments (comments can be turned off on a per-page basis)
-- [ ] can be children of another page (if it isn't itself a child, so only one child level)
+- create the database for the `test` environment: `./docker/symfony doctrine:database:create --env=test`
+- run the migrations and the seeders for the `test` environment: `./docker/symfony doctrine:migrations:migrate --env=test`
+- run the seeders for the test environment:  `./docker/symfony doctrine:fixtures:load --env=test`
+- run the tests `./docker/composer test`
 
-### Comments
+### Run in the browser
 
-- [ ] comments can be added by any registered users on pages and posts where it's allowed
-- [ ] comments can be turned off globally or on a per-page/post basis
-- [ ] users can edit their comments in the admin section
-- [ ] writer can also see and edit the comments attached to their pages and posts
-- [ ] admins can see/update/delete all comments
+- create the database for the `dev` environment: `./docker/symfony doctrine:database:create`
+- run the migrations and the seeders for the `dev` environment: `./docker/symfony doctrine:migrations:migrate`
+- run the seeders for the `dev` environment:  `./docker/symfony doctrine:fixtures:load`
+- the site is accessible at http://localhost:8080 (or whateveer port you set with the `APP_PORT` env var in your `.env` file).
+- the fixtures add three users
+  - `user@example.com`, password is `user`
+  - `writer@example.com`, password is `writer`
+  - `admin@example.com`, password is `admin`
 
-### Miscellaneous
+### Run all the quality tools
 
-- [ ] secure forms, requests to database and display of data
-- [ ] full validation of data on the backend side (writers or commenters can't do anything they aren't supposed to do, even when modifying the HTML of a form through the browser's dev tools)
-- [ ] nice handling of all possible kinds of errors and success messages
-- [ ] emails can be sent via the local email software or SMTP
-- [ ] global configuration saved in the DB, can be edited by admins via a form
-- [ ] works as a subfolder or the root of a domain name
-- [ ] links to pages, posts, categories and medias can be added in the content via wordpress-like shortcodes. Ie: [link:media:the-media-slug]
-- [ ] optional use of Recaptcha on all public forms (set via the secret key in config)
+Quality tools like Rector, PHP-CS-Fixer and PHPStan are installed in the `tools` folder. Instal them with `./docker/composer install --working-dir=./tools`.
+
+Then run them all as well as PHPUnit with the `./docker/composer all` command.  
+Each also have their own composer alias.

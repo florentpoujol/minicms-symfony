@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run -i --user 1000:1000 --rm -v .:/var/minicms-symfony -w /var/minicms-symfony --network minicms-symfony_default minicms-symfony-php:latest composer --ansi "$@"

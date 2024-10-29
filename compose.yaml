@@ -34,7 +34,7 @@ services:
       - ./var/nginxLogs:/var/log/nginx
       - .:/var/minicms-symfony
     ports:
-      - "8080:80"
+      - "${APP_PORT:-8080}:80"
 
 volumes:
   database_data:

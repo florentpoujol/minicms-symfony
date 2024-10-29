@@ -22,12 +22,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 #[AsDoctrineListener(event: Events::postPersist, priority: 500, connection: 'default')]
 #[AsDoctrineListener(event: Events::preUpdate, priority: 500, connection: 'default')]
 #[AsDoctrineListener(event: Events::postRemove, priority: 500, connection: 'default')]
-/**
- * TODO:
- * - for one to many relation ship, only save the identifier, not the whole object
- * - ideally do not save other relationships without the Ignore attribute on theses
- * - for the article > user relationship, see why all properties + getters are serialized, which doesn't happen for the article
- */
 final class AuditLogListener
 {
     /**

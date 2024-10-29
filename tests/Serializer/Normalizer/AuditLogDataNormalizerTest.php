@@ -82,17 +82,9 @@ final class AuditLogDataNormalizerTest extends KernelTestCase
             'email' => 'the email',
             'roles' => ['ROLE_USER', 'ROLE_WRITER'],
             'password' => 'whatever',
-            'verified' => false,
+            'isVerified' => false,
             'createdAt' => '2024-10-29T10:52:00+01:00',
             'updatedAt' => '2024-10-29T10:52:00+01:00',
-
-            // these fields exist in the output, but we don't want them
-            'isVerified' => false,
-            'userIdentifier' => 'the email',
-            'created_at' => '2024-10-29T10:52:00+01:00',
-            'updated_at' => '2024-10-29T10:52:00+01:00',
-            'writer' => true,
-            'admin' => false,
         ];
 
         // act
@@ -102,6 +94,6 @@ final class AuditLogDataNormalizerTest extends KernelTestCase
         $actualData = $normalizer->normalize($user);
 
         // assert
-        self::assertEquals($expectedData, $actualData);
+        self::assertSame($expectedData, $actualData);
     }
 }

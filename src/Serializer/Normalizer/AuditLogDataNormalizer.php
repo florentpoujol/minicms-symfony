@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection as DoctrineCollectionInterface;
 use Doctrine\ORM\Mapping as ORM;
 use ReflectionClass;
 use ReflectionNamedType;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -21,6 +22,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final readonly class AuditLogDataNormalizer
 {
+    /**
+     * @var array<string>
+     */
+    private const array IGNORED_PROPERTIES = [
+        // ignoring some properties like that is needed because otherwise, when normalized for the audit logs,
+        // the User data would have both the 'created_at' and 'createdAt' keys for instance.
+        // It only happens for the User entity thought, not for the Article...
+
+        // on the User entity
+        'created_at', 'updated_at', 'userIdentifier', 'verified', 'writer', 'admin',
+    ];
+
     public function __construct(
         private NormalizerInterface $normalizer,
     ) {
@@ -31,7 +44,9 @@ final readonly class AuditLogDataNormalizer
      */
     public function normalize(object $object): array
     {
-        $data = $this->normalizer->normalize($object, 'array');
+        $data = $this->normalizer->normalize($object, 'array', [
+            AbstractNormalizer::IGNORED_ATTRIBUTES => self::IGNORED_PROPERTIES,
+        ]);
         \assert(\is_array($data));
         /** @var array<string, mixed> $data */
 
@@ -51,6 +66,9 @@ final readonly class AuditLogDataNormalizer
             $typeName = $reflType->getName();
 
             if (is_subclass_of($typeName, DoctrineCollectionInterface::class)) {
+                // Note Florent: this feature is actually not useful since the entities are first normalized with the default ObjectNormalizer
+                // which would throw a Symfony\Component\Serializer\Exception\CircularReferenceException if the entity
+                // didn't already make the Collection properties be ignored via the Ignore attribute
                 continue;
             }
 

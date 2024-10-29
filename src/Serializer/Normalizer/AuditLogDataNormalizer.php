@@ -2,36 +2,38 @@
 
 namespace App\Serializer\Normalizer;
 
+use Doctrine\Common\Collections\Collection as DoctrineCollectionInterface;
 use Doctrine\ORM\Mapping as ORM;
 use ReflectionClass;
 use ReflectionNamedType;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * This normalizer only work with Doctrine entities, and it improves on the object normalizer:
- * - the datetime classes are normalize as a single UTC datetime string
  * - the *ToMany relations are automatically ignored
  * - the *ToOne relations are automatically normalize only as their primary key instead of being normalized as an object
  *
  * Note that this normalizer is only used when creating or deleting an entity.
+ *
+ * The $normalizer property will be \Symfony\Component\Serializer\Serializer.
+ * See link below why this class actually doesn't implement NormalizerInterface
+ * @see https://github.com/symfony/symfony/discussions/58707
  */
 final readonly class AuditLogDataNormalizer
 {
     public function __construct(
-        /**
-         * see why this is not the NormalizerInterface or the ObjectNormalizer directly
-         * @see https://github.com/symfony/symfony/discussions/58707
-         */
-        private SerializerInterface $serializer,
+        private NormalizerInterface $normalizer,
     ) {
     }
 
     /**
-     * @return array<string, scalar|array>
+     * @return array<string, scalar|array<mixed>>
      */
     public function normalize(object $object): array
     {
-        $data = $this->serializer->normalize($object, 'array');
+        $data = $this->normalizer->normalize($object, 'array');
+        \assert(\is_array($data));
+        /** @var array<string, mixed> $data */
 
         $reflClass = new ReflectionClass($object);
         foreach ($data as $key => $value) { // $value here is already the normalized value of the property/getter
@@ -47,13 +49,21 @@ final readonly class AuditLogDataNormalizer
             }
 
             $typeName = $reflType->getName();
-            if (!$this->isDoctrineEntity($typeName)) {
+
+            if (is_subclass_of($typeName, DoctrineCollectionInterface::class)) {
                 continue;
             }
 
-            $primaryKeyProperty = $this->getPrimaryKeyPropertyName($typeName);
-            if (isset($data[$key][$primaryKeyProperty])) {
-                $data[$key] = $data[$key][$primaryKeyProperty];
+            if (\is_array($value) && class_exists($typeName) && $this->isDoctrineEntity($typeName)) {
+                /** @var class-string $typeName */
+                \assert(\is_array($data[$key]));
+
+                $primaryKeyProperty = $this->getPrimaryKeyPropertyName($typeName);
+                if (isset($data[$key][$primaryKeyProperty])) {
+                    $data[$key] = $data[$key][$primaryKeyProperty];
+                }
+
+                continue;
             }
         }
 
@@ -86,12 +96,11 @@ final readonly class AuditLogDataNormalizer
         return '{not found}';
     }
 
-    private function isDoctrineEntity(string|object $object): bool
+    /**
+     * @param class-string $fqcn
+     */
+    private function isDoctrineEntity(string $fqcn): bool
     {
-        if (is_string($object) && !class_exists($object)) {
-            return false;
-        }
-
-        return (new ReflectionClass($object))->getAttributes(ORM\Entity::class) !== [];
+        return (new ReflectionClass($fqcn))->getAttributes(ORM\Entity::class) !== [];
     }
 }

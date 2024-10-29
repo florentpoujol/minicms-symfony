@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Enums\AuditLogAction;
 use App\Serializer\Normalizer\AuditLogDataNormalizer;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PostPersistEventArgs;
@@ -27,8 +28,15 @@ final class AuditLogListener
     /**
      * @var array<class-string>
      */
-    private array $ignoredEntities = [
+    private const array IGNORED_ENTITIES = [
         AuditLog::class,
+    ];
+
+    /**
+     * @var array<class-string, array<string>>
+     */
+    private const array OBFUSCATED_PROPERTIES = [
+        User::class => ['password'],
     ];
 
     public function __construct(
@@ -66,7 +74,7 @@ final class AuditLogListener
     private function saveLog(LifecycleEventArgs $event, AuditLogAction $action): void
     {
         $entity = $event->getObject();
-        if (\in_array($entity::class, $this->ignoredEntities, true)) {
+        if (\in_array($entity::class, self::IGNORED_ENTITIES, true)) {
             return;
         }
 
@@ -102,24 +110,50 @@ final class AuditLogListener
         } elseif ($action === AuditLogAction::DELETE) {
             $data['before'] = $this->normalizer->normalize($entity);
         } elseif ($action === AuditLogAction::UPDATE) {
-            $data['before'] = [];
-            $data['after'] = [];
-
             \assert($event instanceof PreUpdateEventArgs);
             $changeSet = $event->getEntityChangeSet();
 
+            $beforeArray = [];
+            $afterArray = [];
             /**
              * @var string $property
              * @var array{0: mixed, 1: mixed} $beforeAndAfter 0 is before, 1 is after
              */
             foreach ($changeSet as $property => $beforeAndAfter) {
-                $data['before'][$property] = $beforeAndAfter[0];
-                $data['after'][$property] = $beforeAndAfter[1];
+                // note that here the $property name is the actual property name, so in snake case like "created_at"
+                // where for the creation and deletion, the keys would be the camel cased version, like "createdAt"
+
+                if ($beforeAndAfter[0] instanceof DateTimeInterface) {
+                    $beforeAndAfter[0] = $beforeAndAfter[0]->format(DateTimeInterface::ISO8601_EXPANDED);
+                }
+                $beforeArray[$property] = $beforeAndAfter[0];
+
+                if ($beforeAndAfter[1] instanceof DateTimeInterface) {
+                    $beforeAndAfter[1] = $beforeAndAfter[1]->format(DateTimeInterface::ISO8601_EXPANDED);
+                }
+                $afterArray[$property] = $beforeAndAfter[1];
+            }
+
+            // $beforeEntity = $this->denormalizer->denormalize($beforeArray, $entity::class); // doesn't work because the DateTime denormalizer doesn't expect the value to already be of the correct type
+
+            $data['before'] = $beforeArray;
+            $data['after'] = $afterArray;
+        }
+
+        // remove sensitive properties
+        $obfuscatedProperties = self::OBFUSCATED_PROPERTIES[$entity::class] ?? [];
+        if ($obfuscatedProperties !== []) {
+            foreach ($obfuscatedProperties as $property) {
+                if (isset($data['before'][$property]) && \is_string($data['before'][$property])) {
+                    $data['before'][$property] = substr($data['before'][$property], 0, 5) . '(obfuscated)';
+                }
+                if (isset($data['after'][$property]) && \is_string($data['after'][$property])) {
+                    $data['after'][$property] = substr($data['after'][$property], 0, 5) . '(obfuscated)';
+                }
             }
         }
 
-        // remove sensitive properties ? (maybe done by the serializer)
-        // ideally we would like to keep the sensitive properties, but redact their values
+        //--------------------------------------------------
 
         // Calling flush() here (inside a doctrine lifecycle event listener) is "strongly discouraged" by the doc
         // https://www.doctrine-project.org/projects/doctrine-orm/en/3.3/reference/events.html#events-overview.

@@ -19,6 +19,7 @@ The point of this project is both to practice and showcase my capabilities in we
 - Built-in User authentication
 - Forms
 - Application tests
+- Custom normalizer (almost)
 - Doctrine 
   - entities with relations + repositories
   - entities lifecycle events

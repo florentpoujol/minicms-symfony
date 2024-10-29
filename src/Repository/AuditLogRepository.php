@@ -16,6 +16,16 @@ final class AuditLogRepository extends ServiceEntityRepository
         parent::__construct($registry, AuditLog::class);
     }
 
+    public function getLast(): AuditLog
+    {
+        return $this->createQueryBuilder('al') // @phpstan-ignore-line (should return AuditLog but returns mixed) (this is because what returns getQuery() isn't generic)
+           ->orderBy('al.id', 'DESC')
+           ->setMaxResults(1)
+           ->getQuery()
+           ->getSingleResult()
+        ;
+    }
+
 //    /**
 //     * @return AuditLog[] Returns an array of AuditLog objects
 //     */

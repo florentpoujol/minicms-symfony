@@ -6,6 +6,7 @@ use App\Entity\Article;
 use App\Entity\User;
 use App\Form\ArticleForm;
 use App\Repository\ArticleRepository;
+use App\Repository\AuditLogRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,6 +48,7 @@ final class ArticleController extends AbstractController
         User $user,
         Request $request,
         EntityManagerInterface $entityManager,
+        AuditLogRepository $auditLogRepository,
     ): Response
     {
         $isCreateForm = $article === null;
@@ -79,6 +81,7 @@ final class ArticleController extends AbstractController
             'form' => $form,
             'article' => $article,
             'isCreateForm' => $isCreateForm,
+            'auditLogs' => $article !== null ? $auditLogRepository->getForEntity($article) : [],
         ]);
     }
 }

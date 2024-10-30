@@ -35,5 +35,36 @@
 
     {{ form(form) }}
 
+    {% if not isCreateForm %}
+    <div id="audit_logs">
+        <h2>Audit Logs</h2>
+
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>context</th>
+                <th>data before</th>
+                <th>data after</th>
+            </tr>
+
+            {% for log in auditLogs %}
+                {% set data = log.getViewData() %}
+                <tr>
+                    <td>{{ data.id }}</td>
+                    <td>{{ data.date }}</td>
+                    <td>{{ data.userEmail }}</td>
+                    <td>{{ data.action }}</td>
+                    <td>{{ data.context }}</td>
+                    <td><pre>{{ data.before }}</pre></td> <!-- pretty printed JSON -->
+                    <td><pre>{{ data.after }}</pre></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

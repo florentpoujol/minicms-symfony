@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\AuditLog;
+use App\Entity\DoctrineEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,6 +26,33 @@ final class AuditLogRepository extends ServiceEntityRepository
            ->getQuery()
            ->getSingleResult()
         ;
+    }
+
+    /**
+     * @return ArrayCollection<int, AuditLog>
+     */
+    public function getForEntity(DoctrineEntity $entity): ArrayCollection // @phpstan-ignore-line (Parameters should have "App\Entity\Article" types as the only types passed to this method)
+    {
+        /** @var array<int, AuditLog> $array */
+        $array = $this->createQueryBuilder('al')
+
+            ->andWhere('al.entity_id = :entity_id')
+            ->setParameter('entity_id', $entity->getId())
+
+            ->andWhere('al.entity_type = :entity_type')
+            ->setParameter('entity_type', AuditLog::getTypeForEntity($entity::class))
+
+            // eager load user's email
+            ->leftJoin('al.user', 'u')
+            ->addSelect('u') // not sure how to only ask for user's id and email
+            ->andWhere('al.user = u.id')
+
+            ->orderBy('al.id', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return new ArrayCollection($array);
     }
 
 //    /**

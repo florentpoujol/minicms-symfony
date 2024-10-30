@@ -155,4 +155,19 @@ class AuditLog implements DoctrineEntity
         $this->entity_type =  self::getTypeForEntity($entity::class);
         $this->entity_id = $entity->getId();
     }
+
+    public function getViewData(): AuditLogViewData
+    {
+        return new AuditLogViewData(
+            id: $this->id,
+            date: substr($this->created_at?->format('Y-m-d H:i:s.u') ?? '', 0, -4),
+            userEmail: $this->user?->getEmail(),
+            action: $this->action?->value,
+            context: $this->context,
+            rawData: $this->data,
+            data: json_encode($this->data, \JSON_PRETTY_PRINT|\JSON_THROW_ON_ERROR),
+            before: json_encode($this->data['before'] ?? [], \JSON_PRETTY_PRINT|\JSON_THROW_ON_ERROR),
+            after: json_encode($this->data['after'] ?? [], \JSON_PRETTY_PRINT|\JSON_THROW_ON_ERROR),
+        );
+    }
 }

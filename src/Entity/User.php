@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, DoctrineEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

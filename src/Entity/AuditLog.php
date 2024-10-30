@@ -7,12 +7,12 @@ use App\Repository\AuditLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AuditLogRepository::class)]
-class AuditLog
+class AuditLog implements DoctrineEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'bigint')]
-    private ?int $id = null;
+    private int $id; // @phpstan-ignore-line (is never written, only read)
 
     #[ORM\Column(enumType: AuditLogAction::class)]
     private ?AuditLogAction $action = null;
@@ -32,7 +32,7 @@ class AuditLog
     #[ORM\ManyToOne(inversedBy: 'auditLogs')]
     private ?User $user = null;
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -106,7 +106,7 @@ class AuditLog
     //--------------------------------------------------
 
     /**
-     * @var array<int, class-string>
+     * @var array<int, class-string<DoctrineEntity>>
      */
     private static array $morphMap = [
         1 => User::class,
@@ -130,13 +130,16 @@ class AuditLog
     }
 
     /**
-     * @return class-string
+     * @return class-string<DoctrineEntity>
      */
     public function getEntityFqcn(): string
     {
         return self::$morphMap[$this->entity_type];
     }
 
+    /**
+     * @param class-string<DoctrineEntity> $entityFqcn
+     */
     public static function getTypeForEntity(string $entityFqcn): int
     {
         $typeId = array_search($entityFqcn, self::$morphMap, true);
@@ -147,20 +150,9 @@ class AuditLog
         return $typeId;
     }
 
-    public function setEntity(object $entity): void
+    public function setEntity(DoctrineEntity $entity): void
     {
-        $entityFqcn = $entity::class;
-        $this->entity_type =  self::getTypeForEntity($entityFqcn);
-
-        if (!method_exists($entity, 'getId')) {
-            throw new \UnexpectedValueException("No method getId() found on class '$entityFqcn'");
-        }
-
-        $entityId = $entity->getId();
-        if ($entityId === null) {
-            throw new \UnexpectedValueException("Entity of type '$entityFqcn' has no id defined");
-        }
-
-        $this->entity_id = $entityId;
+        $this->entity_type =  self::getTypeForEntity($entity::class);
+        $this->entity_id = $entity->getId();
     }
 }

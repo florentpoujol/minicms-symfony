@@ -2,6 +2,7 @@
 
 namespace App\Serializer\Normalizer;
 
+use App\Entity\DoctrineEntity;
 use Doctrine\Common\Collections\Collection as DoctrineCollectionInterface;
 use Doctrine\ORM\Mapping as ORM;
 use ReflectionClass;
@@ -42,7 +43,7 @@ final readonly class AuditLogDataNormalizer
     /**
      * @return array<string, scalar|array<mixed>>
      */
-    public function normalize(object $object): array
+    public function normalize(DoctrineEntity $object): array
     {
         $data = $this->normalizer->normalize($object, 'array', [
             AbstractNormalizer::IGNORED_ATTRIBUTES => self::IGNORED_PROPERTIES,
@@ -72,8 +73,8 @@ final readonly class AuditLogDataNormalizer
                 continue;
             }
 
-            if (\is_array($value) && class_exists($typeName) && $this->isDoctrineEntity($typeName)) {
-                /** @var class-string $typeName */
+            if (\is_array($value) && class_exists($typeName) && is_subclass_of($typeName, DoctrineEntity::class)) {
+                /** @var class-string<DoctrineEntity> $typeName */
                 \assert(\is_array($data[$key]));
 
                 $primaryKeyProperty = $this->getPrimaryKeyPropertyName($typeName);
@@ -89,7 +90,7 @@ final readonly class AuditLogDataNormalizer
     }
 
     /**
-     * @param class-string $entityFqcn
+     * @param class-string<DoctrineEntity> $entityFqcn
      *
      * @return string The property name, or '{ not found}' if no property is found
      */
@@ -112,13 +113,5 @@ final readonly class AuditLogDataNormalizer
         }
 
         return '{not found}';
-    }
-
-    /**
-     * @param class-string $fqcn
-     */
-    private function isDoctrineEntity(string $fqcn): bool
-    {
-        return (new ReflectionClass($fqcn))->getAttributes(ORM\Entity::class) !== [];
     }
 }

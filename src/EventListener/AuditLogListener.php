@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Entity\AuditLog;
+use App\Entity\DoctrineEntity;
 use App\Entity\User;
 use App\Enums\AuditLogAction;
 use App\Serializer\Normalizer\AuditLogDataNormalizer;
@@ -26,14 +27,14 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 final class AuditLogListener
 {
     /**
-     * @var array<class-string>
+     * @var array<class-string<DoctrineEntity>>
      */
     private const array IGNORED_ENTITIES = [
         AuditLog::class,
     ];
 
     /**
-     * @var array<class-string, array<string>>
+     * @var array<class-string<DoctrineEntity>, array<string>>
      */
     private const array OBFUSCATED_PROPERTIES = [
         User::class => ['password'],
@@ -77,6 +78,7 @@ final class AuditLogListener
         if (\in_array($entity::class, self::IGNORED_ENTITIES, true)) {
             return;
         }
+        \assert($entity instanceof DoctrineEntity);
 
         $context = '{unknown}';
         $user = null;

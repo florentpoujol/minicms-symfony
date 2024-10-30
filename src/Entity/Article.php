@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[ORM\Table(name: '`article`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SLUG', fields: ['slug'])]
 #[UniqueEntity(fields: ['slug'], message: 'There is already an article with this title')]
-class Article
+class Article implements DoctrineEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

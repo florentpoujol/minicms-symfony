@@ -31,7 +31,11 @@ final class AuditLogRepository extends ServiceEntityRepository
     /**
      * @return ArrayCollection<int, AuditLog>
      */
-    public function getForEntity(DoctrineEntity $entity): ArrayCollection // @phpstan-ignore-line (Parameters should have "App\Entity\Article" types as the only types passed to this method)
+    public function getForEntity( // @phpstan-ignore-line (Parameters should have "App\Entity\Article" types as the only types passed to this method)
+        DoctrineEntity $entity,
+        int $page = 1,
+        int $perPage = 50,
+    ): ArrayCollection
     {
         /** @var array<int, AuditLog> $array */
         $array = $this->createQueryBuilder('al')
@@ -48,6 +52,10 @@ final class AuditLogRepository extends ServiceEntityRepository
             ->andWhere('al.user = u.id')
 
             ->orderBy('al.id', 'DESC')
+
+            ->setFirstResult($perPage * ($page - 1) + 1)
+            ->setMaxResults($perPage)
+
             ->getQuery()
             ->getResult()
         ;

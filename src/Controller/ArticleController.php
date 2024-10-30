@@ -12,6 +12,7 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -42,13 +43,13 @@ final class ArticleController extends AbstractController
     #[Route('/admin/articles/create', name: 'admin_articles_create')]
     #[Route('/admin/articles/{slug}/edit', name: 'admin_articles_edit')]
     public function form(
-        #[MapEntity(mapping: ['slug' => 'slug'])]
-        ?Article $article,
-        #[CurrentUser]
-        User $user,
+        #[MapEntity(mapping: ['slug' => 'slug'])] ?Article $article,
+        #[CurrentUser] User $user,
         Request $request,
         EntityManagerInterface $entityManager,
         AuditLogRepository $auditLogRepository,
+        #[MapQueryParameter] int $auditLogPage = 1,
+        #[MapQueryParameter] int $auditLogPerPage = 2,
     ): Response
     {
         $isCreateForm = $article === null;
@@ -81,7 +82,11 @@ final class ArticleController extends AbstractController
             'form' => $form,
             'article' => $article,
             'isCreateForm' => $isCreateForm,
-            'auditLogs' => $article !== null ? $auditLogRepository->getForEntity($article) : [],
+            'auditLogs' => [
+                'results' => $article !== null ? $auditLogRepository->getForEntity($article, $auditLogPage, $auditLogPerPage) : [],
+                'page' => $auditLogPage,
+                'perPage' => $auditLogPerPage,
+            ],
         ]);
     }
 }

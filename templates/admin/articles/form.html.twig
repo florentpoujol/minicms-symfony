@@ -37,8 +37,11 @@
 
     {% if not isCreateForm %}
     <div id="audit_logs">
-        <h2>Audit Logs</h2>
+        <h2>Audit logs</h2>
 
+        {% if auditLogs.results.count < 1 and auditLogs.page == 1 %}
+            <p>None yet.</p>
+        {% else %}
         <table>
             <tr>
                 <th>Id</th>
@@ -50,7 +53,7 @@
                 <th>data after</th>
             </tr>
 
-            {% for log in auditLogs %}
+            {% for log in auditLogs.results %}
                 {% set data = log.getViewData() %}
                 <tr>
                     <td>{{ data.id }}</td>
@@ -63,6 +66,20 @@
                 </tr>
             {% endfor %}
         </table>
+
+        <div id="pagination">
+            <ul>
+                {% if auditLogs.page > 1 %}
+                    <li><a href="{{ path('admin_articles_edit', {slug: article.slug, auditLogPage: auditLogs.page - 1, auditLogPerPage: auditLogs.perPage})  }}">Previous Page</a></li>
+                {% endif %}
+                <li>Page: {{ auditLogs.page }} ({{ auditLogs.perPage }} per page)</li>
+                {% if auditLogs.results.count > 1 %}
+                <li><a href="{{ path('admin_articles_edit', {slug: article.slug, auditLogPage: auditLogs.page + 1, auditLogPerPage: auditLogs.perPage}) }}">Next Page</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
+        {% endif %}
     </div>
     {% endif %}
 

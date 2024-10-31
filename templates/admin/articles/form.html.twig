@@ -37,34 +37,39 @@
 
     {% if not isCreateForm %}
     <div id="audit_logs">
+        <br>
         <h2>Audit logs</h2>
 
         {% if auditLogs.results.count < 1 and auditLogs.page == 1 %}
             <p>None yet.</p>
         {% else %}
-        <table>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>User</th>
-                <th>Action</th>
-                <th>context</th>
-                <th>data before</th>
-                <th>data after</th>
-            </tr>
-
-            {% for log in auditLogs.results %}
-                {% set data = log.getViewData() %}
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>{{ data.id }}</td>
-                    <td>{{ data.date }}</td>
-                    <td>{{ data.userEmail }}</td>
-                    <td>{{ data.action }}</td>
-                    <td>{{ data.context }}</td>
-                    <td><pre>{{ data.before }}</pre></td> <!-- pretty printed JSON -->
-                    <td><pre>{{ data.after }}</pre></td>
+                    <th>Id</th>
+                    <th>Date</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>context</th>
+                    <th>data before</th>
+                    <th>data after</th>
                 </tr>
-            {% endfor %}
+            </thead>
+
+            <tbody>
+                {% for log in auditLogs.results %}
+                    {% set data = log.getViewData() %}
+                    <tr>
+                        <td>{{ data.id }}</td>
+                        <td>{{ data.date }}</td>
+                        <td>{{ data.userEmail }}</td>
+                        <td>{{ data.action }}</td>
+                        <td>{{ data.context }}</td>
+                        <td><pre>{{ data.before }}</pre></td> <!-- pretty printed JSON -->
+                        <td><pre>{{ data.after }}</pre></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
 
         <div id="pagination">

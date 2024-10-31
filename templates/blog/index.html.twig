@@ -9,7 +9,9 @@
     {% for article in articles %}
         <article>
             <h2>{{ article.title }}</h2>
+
             <aside>Published on {{ article.publishedAt | format_datetime('full', locale: 'fr') }} by {{ article.user.email }}</aside>
+            <br>
 
             <p>
                 {{ article.content | show_excerpt }} ...

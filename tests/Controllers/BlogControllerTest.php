@@ -39,9 +39,16 @@ final class BlogControllerTest extends WebTestCase
         return (string) $this->client->getResponse()->getContent();
     }
 
-    public function testWeCanSeeTheHomePageWithArticles(): void
+    public function testHomeRedirectsToBlog(): void
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/');
+        $this->client->request(Request::METHOD_GET, '/');
+
+        self::assertResponseRedirects('/blog');
+    }
+
+    public function testWeCanSeeTheBlogPageWithArticles(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/blog');
 
         self::assertResponseIsSuccessful();
         self::assertAnySelectorTextContains('h1', 'Articles');

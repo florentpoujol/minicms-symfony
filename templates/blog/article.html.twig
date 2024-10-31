@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Blog{% endblock %}
+{% block title %}Blog: {{ article.title }}{% endblock %}
 
 {% block body %}
 <div>
@@ -8,6 +8,7 @@
         <h1>{{ article.title }}</h1>
 
         <aside>Published on {{ article.publishedAt | format_datetime('full', locale: 'fr') }} by {{ article.user.email }}</aside>
+        <br>
 
         <p>
             {{ article.content }}

@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Repository\ArticleRepository;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
@@ -23,7 +23,13 @@ final class BlogController extends AbstractController
     }
 
     #[Route('/', name: 'app_home')]
-    public function index(): Response
+    public function index(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_blog');
+    }
+
+    #[Route('/blog', name: 'app_blog')]
+    public function blog(): Response
     {
         $this->twig->addFilter(new TwigFilter('show_excerpt', fn ($text): string => substr($text, 0, 500)));
 

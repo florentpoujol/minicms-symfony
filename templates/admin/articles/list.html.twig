@@ -17,45 +17,51 @@
         <a href="{{ path('admin_articles_create') }}">Write a new article</a>
     </p>
 
-    <table>
-        <tr>
-            <th>Id</th>
-            <th>Writer</th>
-            <th>Title</th>
-            <th>Slug</th>
-            <th>Content size</th>
-            <th>Allow comments</th>
-            <th>Published</th>
-            <th>Created</th>
-            <th>Updated</th>
-            <th>Actions</th>
-        </tr>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Writer</th>
+                <th>Title</th>
+                <th>Slug</th>
+                <th>Content size</th>
+                <th>Allow comments</th>
+                <th>Published</th>
+                <th>Created</th>
+                <th>Updated</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
-        {% for article in articles %}
-        <tr>
-            <td>{{ article.id }}</td>
-            <td>{{ article.user.email }}</td>
-            <td>{{ article.title }}</td>
-            <td>{{ article.slug }}</td>
-            <td>{{ article.content | strlen }} chars</td>
-            <td>{{ article.allowComments ? 'Yes' : 'No' }}</td>
-            <td
-                    {% if article.publishedAt is not null and date(article.publishedAt) > date() %}
-                        style="background-color:orange"
-                    {% elseif article.publishedAt is not null and date(article.publishedAt) < date() %}
-                        style="background-color:lightgreen"
-                    {% endif %}
-            >
-                {{ article.publishedAt ? article.publishedAt | format_datetime('short', locale: 'fr') : 'Draft' }}
-            </td>
-            <td>{{ article.createdAt | format_datetime('short', locale: 'fr') }}</td>
-            <td>{{ article.updatedAt | format_datetime('short', locale: 'fr') }}</td>
-            <td>
-                    <a href="{{ path('app_article_show', {slug: article.slug}) }}">Read</a> <br>
-                    <a href="{{ path('admin_articles_edit', {slug: article.slug}) }}">Edit</a>
-            </td>
-        </tr>
-        {% endfor %}
+        <tbody>
+            {% for article in articles %}
+            <tr>
+                <td>{{ article.id }}</td>
+                <td>{{ article.user.email }}</td>
+                <td>{{ article.title }}</td>
+                <td>{{ article.slug }}</td>
+                <td>{{ article.content | strlen }} chars</td>
+                <td>{{ article.allowComments ? 'Yes' : 'No' }}</td>
+                <td
+                        {% if article.publishedAt is not null and date(article.publishedAt) > date() %}
+                            class="table-warning"
+                        {% elseif article.publishedAt is not null and date(article.publishedAt) < date() %}
+                            class="table-success"
+                        {% endif %}
+                >
+                    {{ article.publishedAt ? article.publishedAt | format_datetime('short', locale: 'fr') : 'Draft' }}
+                </td>
+                <td>{{ article.createdAt | format_datetime('short', locale: 'fr') }}</td>
+                <td>{{ article.updatedAt | format_datetime('short', locale: 'fr') }}</td>
+                <td style="min-width:150px">
+                    <div class="d-grid gap-2 d-md-block">
+                        <a class="btn btn-outline-primary" href="{{ path('app_article_show', {slug: article.slug}) }}">Read</a>
+                        <a class="btn btn-outline-warning" href="{{ path('admin_articles_edit', {slug: article.slug}) }}">Edit</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 {% endblock %}

@@ -79,7 +79,7 @@ final class SecurityControllerTest extends WebTestCase
 
         // act
         $this->client->loginUser($user);
-        $this->client->request(Request::METHOD_GET, '/admin');
+        $this->client->request(Request::METHOD_GET, '/admin/articles');
 
         // assert
         if ($user->getEmail() === 'user@example.com') {

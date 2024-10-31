@@ -3,16 +3,14 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class AdminController extends AbstractController
 {
     #[Route('/admin', name: 'admin_dashboard')]
-    public function index(): Response
+    public function index(): RedirectResponse
     {
-        return $this->render('admin/dashboard.html.twig', [
-            //
-        ]);
+        return $this->redirectToRoute('admin_articles_list');
     }
 }

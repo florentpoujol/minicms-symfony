@@ -32,7 +32,7 @@ final readonly class AuditLogDataNormalizer
         // It only happens for the User entity thought, not for the Article...
 
         // on the User entity
-        'created_at', 'updated_at', 'userIdentifier', 'verified', 'writer', 'admin',
+        'created_at', 'updated_at', 'userIdentifier', 'verified', 'writer', 'admin', 'name',
     ];
 
     public function __construct(

@@ -1,18 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfileController!{% endblock %}
+{% block title %}Profile{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<h1>Hello {{ user.name }}</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<ul>
+    {% if isAdmin %}
+    <li>Id: {{ user.id }}</li>
+    {% endif %}
 
-    <div class="mb-3">
-        You are logged in as {{ app.user.userIdentifier }}, <br><br> <a href="{{ path('app_logout') }}">Logout</a>
-    </div>
-</div>
+    <li>Email: {{ user.email }}</li>
+
+    {% if isAdmin %}
+    <li>Your role: Admin</li>
+    {% elseif isWriter %}
+    <li>Your role: Writer</li>
+    {% else %}
+    <li>Your role: Regular user</li>
+    {% endif %}
+
+    <li>Registered at: {{ user.createdAt | format_datetime('short', locale: 'fr') }}</li>
+</ul>
 {% endblock %}

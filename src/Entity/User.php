@@ -254,4 +254,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
 
         return $this;
     }
+
+    /**
+     * Return a Pascal-cased version of the part that comes before that @ in the user's email.
+     *
+     * Ie: "florent.poujol@example.com" > "Florent Poujol"
+     */
+    public function getName(): string
+    {
+        [$name, ] = explode('@', $this->getEmail(),2);
+
+        $name = str_replace(['-', '_'], '.', $name);
+
+        $names = explode('.', $name);
+        foreach ($names as $i => $_name) {
+            $names[$i][0] = strtoupper($_name[0]);
+        }
+
+        return implode(' ', $names);
+    }
 }

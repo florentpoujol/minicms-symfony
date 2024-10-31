@@ -53,7 +53,7 @@ final class AuditLogRepository extends ServiceEntityRepository
 
             ->orderBy('al.id', 'DESC')
 
-            ->setFirstResult($perPage * ($page - 1) + 1)
+            ->setFirstResult($perPage * ($page - 1))
             ->setMaxResults($perPage)
 
             ->getQuery()

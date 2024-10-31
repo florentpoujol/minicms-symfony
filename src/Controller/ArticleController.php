@@ -49,7 +49,7 @@ final class ArticleController extends AbstractController
         EntityManagerInterface $entityManager,
         AuditLogRepository $auditLogRepository,
         #[MapQueryParameter] int $auditLogPage = 1,
-        #[MapQueryParameter] int $auditLogPerPage = 2,
+        #[MapQueryParameter] int $auditLogPerPage = 5,
     ): Response
     {
         $isCreateForm = $article === null;
@@ -67,9 +67,6 @@ final class ArticleController extends AbstractController
                 $article->setSlug($slug);
 
                 $article->setUser($user);
-                $article->setCurrentTimestamps();
-            } else {
-                $article->setUpdatedAt(new \DateTimeImmutable());
             }
 
             $entityManager->persist($article);

@@ -13,8 +13,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 #[ORM\Table(name: '`article`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SLUG', fields: ['slug'])]
 #[UniqueEntity(fields: ['slug'], message: 'There is already an article with this title')]
+#[ORM\HasLifecycleCallbacks]
 class Article implements DoctrineEntity
 {
+    use HasAutomaticTimestamps;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -155,11 +158,5 @@ class Article implements DoctrineEntity
         $this->user = $user;
 
         return $this;
-    }
-
-    public function setCurrentTimestamps(): void
-    {
-        $this->created_at = new \DateTimeImmutable();
-        $this->updated_at = clone $this->created_at;
     }
 }

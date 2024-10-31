@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, DoctrineEntity
 {
+    use HasAutomaticTimestamps;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

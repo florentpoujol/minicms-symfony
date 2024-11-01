@@ -2,6 +2,7 @@
 
 namespace App\Tests\EventListener;
 
+use App\Entity\Article;
 use App\Entity\AuditLog;
 use App\Entity\User;
 use App\Repository\AuditLogRepository;
@@ -53,7 +54,47 @@ final class AuditLogListenerTest extends KernelTestCase
         self::assertSame('$2y$13$RV...', $after['obfuscatedPassword']);
         self::assertSame(['ROLE_USER', 'ROLE_WRITER'], $after['roles']);
         self::assertFalse($after['isVerified']);
-        self::assertSame('2024-10-29T10:52:00+01:00', $after['created_at']);
-        self::assertSame('2024-10-29T10:52:00+01:00', $after['updated_at']);
+        self::assertArrayHasKey('created_at', $after);
+        self::assertArrayHasKey('updated_at', $after);
     }
+
+    public function test_create_a_article(): void
+    {
+        // arrange
+        $article = new Article();
+        $article
+            ->setTitle('the title')
+            ->setSlug('the-title')
+            ->setContent('the content');
+
+        $user = new User();
+        $user
+            ->setEmail('the email')
+            ->setPassword('');
+
+        $article->setUser($user);
+
+        // act
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $this->entityManager->persist($article);
+        $this->entityManager->flush();
+
+        // assert
+        $lastAuditLog = $this->auditLogRepository->getLast();
+
+        self::assertSame(Article::class, $lastAuditLog->getEntityFqcn());
+
+        $after = $lastAuditLog->getData()['after'] ?? [];
+        self::assertNotEmpty($after);
+        self::assertSame('the title', $after['title']);
+        self::assertSame('the content', $after['content']);
+        self::assertNull($after['published_at']);
+        self::assertTrue($after['allow_comments']);
+        self::assertArrayHasKey('created_at', $after);
+        self::assertArrayHasKey('updated_at', $after);
+        self::assertSame(['id' => $user->getId()], $after['user']);
+    }
+
 }

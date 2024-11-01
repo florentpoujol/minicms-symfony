@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Attribute as Serializer;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, DoctrineEntity
 {
     use HasAutomaticTimestamps;
@@ -23,18 +24,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user', 'audit_log.when_entity_relation'])]
     private int $id;
 
     #[ORM\Column(length: 180)]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user'])]
     private string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user'])]
     private array $roles = [];
 
     /**
@@ -44,15 +45,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
     private string $password;
 
     #[ORM\Column]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user'])]
     private bool $isVerified = false;
 
     #[ORM\Column(updatable: false, columnDefinition: "DATETIME not null default current_timestamp")]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user'])]
     private DateTimeImmutable $created_at;
 
     #[ORM\Column(columnDefinition: "DATETIME not null default current_timestamp on update current_timestamp")]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user'])]
     private DateTimeImmutable $updated_at;
 
     /**
@@ -279,7 +280,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
         return implode(' ', $names);
     }
 
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.user'])]
     public function getObfuscatedPassword(): string
     {
         // ie: "$2y$13$RV..." this is enough to show that the password hash has changed

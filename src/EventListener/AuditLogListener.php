@@ -109,7 +109,15 @@ final class AuditLogListener
         }
 
         $data = [];
-        $serializationContext = [AbstractNormalizer::GROUPS => ['audit_log'],];
+
+        $paths = explode('\\', $entity::class);
+        $entityName = strtolower(end($paths));
+        $serializationContext = [
+            AbstractNormalizer::GROUPS => [
+                "audit_log.$entityName", // the main entity we want to serialize
+                'audit_log.when_entity_relation', // this allows to serialize entity relation's but only their PK
+            ],
+        ];
 
         if ($action === AuditLogAction::CREATE) {
             $data['after'] = $this->normalizer->normalize($entity, context: $serializationContext);

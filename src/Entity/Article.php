@@ -22,43 +22,44 @@ class Article implements DoctrineEntity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article', 'audit_log.when_entity_relation'])]
     private int $id;
 
     #[Assert\NotBlank]
     #[Assert\Length(max: 200)]
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private string $title;
 
     #[ORM\Column(length: 255)]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private string $slug;
 
     #[Assert\NotBlank]
     #[Assert\Length(max: 99_999)]
     #[ORM\Column(type: Types::TEXT)]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private string $content;
 
     #[ORM\Column]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private bool $allow_comments = true;
 
     #[ORM\Column(nullable: true)]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private ?DateTimeImmutable $published_at = null;
 
     #[ORM\Column(updatable: false, columnDefinition: "DATETIME not null default current_timestamp")]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private DateTimeImmutable $created_at;
 
     #[ORM\Column(columnDefinition: "DATETIME not null default current_timestamp on update current_timestamp")]
-    #[Serializer\Groups(['audit_log'])]
+    #[Serializer\Groups(['audit_log.article'])]
     private DateTimeImmutable $updated_at;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Serializer\Groups(['audit_log.article'])]
     private User $user;
 
     public function getId(): int
@@ -167,11 +168,5 @@ class Article implements DoctrineEntity
         $this->user = $user;
 
         return $this;
-    }
-
-    #[Serializer\Groups(['audit_log'])]
-    public function getUserId(): int
-    {
-        return $this->user->getId();
     }
 }

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Twig\Environment;
 use Twig\TwigFilter;
@@ -38,7 +39,7 @@ final class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/blog/{slug}', name: 'app_article_show')]
+    #[Route('/blog/{slug}', name: 'app_article_show', requirements: ['slug' => Requirement::ASCII_SLUG])]
     public function showArticle(
         #[MapEntity(mapping: ['slug' => 'slug'])] // note: from the documentation, this should work without the explicit mapping
         Article $article,

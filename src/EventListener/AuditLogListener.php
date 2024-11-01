@@ -6,7 +6,6 @@ use App\Entity\AuditLog;
 use App\Entity\DoctrineEntity;
 use App\Entity\User;
 use App\Enums\AuditLogAction;
-use App\Serializer\Normalizer\AuditLogDataNormalizer;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
@@ -20,6 +19,8 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsDoctrineListener(event: Events::postPersist, priority: 500, connection: 'default')]
 #[AsDoctrineListener(event: Events::preUpdate, priority: 500, connection: 'default')]
@@ -43,7 +44,7 @@ final class AuditLogListener
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
         private readonly RequestStack $requestStack,
-        private readonly AuditLogDataNormalizer $normalizer,
+        private readonly NormalizerInterface $normalizer,
         private readonly EntityManagerInterface $entityManager,
     )
     {
@@ -68,6 +69,8 @@ final class AuditLogListener
     {
         $this->saveLog($event, AuditLogAction::DELETE);
     }
+
+    //--------------------------------------------------
 
     /**
      * @param LifecycleEventArgs<ObjectManager> $event
@@ -106,11 +109,12 @@ final class AuditLogListener
         }
 
         $data = [];
-        // $this->normalizer is App\Serializer\Normalizer\AuditLogDataNormalizer
+        $serializationContext = [AbstractNormalizer::GROUPS => ['audit_log'],];
+
         if ($action === AuditLogAction::CREATE) {
-            $data['after'] = $this->normalizer->normalize($entity);
+            $data['after'] = $this->normalizer->normalize($entity, context: $serializationContext);
         } elseif ($action === AuditLogAction::DELETE) {
-            $data['before'] = $this->normalizer->normalize($entity);
+            $data['before'] = $this->normalizer->normalize($entity, context: $serializationContext);
         } elseif ($action === AuditLogAction::UPDATE) {
             \assert($event instanceof PreUpdateEventArgs);
             $changeSet = $event->getEntityChangeSet();
@@ -126,12 +130,12 @@ final class AuditLogListener
                 // where for the creation and deletion, the keys would be the camel cased version, like "createdAt"
 
                 if ($beforeAndAfter[0] instanceof DateTimeInterface) {
-                    $beforeAndAfter[0] = $beforeAndAfter[0]->format(DateTimeInterface::ISO8601_EXPANDED);
+                    $beforeAndAfter[0] = $beforeAndAfter[0]->format(DateTimeInterface::ATOM);
                 }
                 $beforeArray[$property] = $beforeAndAfter[0];
 
                 if ($beforeAndAfter[1] instanceof DateTimeInterface) {
-                    $beforeAndAfter[1] = $beforeAndAfter[1]->format(DateTimeInterface::ISO8601_EXPANDED);
+                    $beforeAndAfter[1] = $beforeAndAfter[1]->format(DateTimeInterface::ATOM);
                 }
                 $afterArray[$property] = $beforeAndAfter[1];
             }
@@ -149,6 +153,7 @@ final class AuditLogListener
                 if (isset($data['before'][$property]) && \is_string($data['before'][$property])) {
                     $data['before'][$property] = substr($data['before'][$property], 0, 5) . '(obfuscated)';
                 }
+
                 if (isset($data['after'][$property]) && \is_string($data['after'][$property])) {
                     $data['after'][$property] = substr($data['after'][$property], 0, 5) . '(obfuscated)';
                 }

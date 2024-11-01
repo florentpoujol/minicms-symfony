@@ -3,13 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -22,15 +23,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Serializer\Groups(['audit_log'])]
     private int $id;
 
     #[ORM\Column(length: 180)]
+    #[Serializer\Groups(['audit_log'])]
     private string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Serializer\Groups(['audit_log'])]
     private array $roles = [];
 
     /**
@@ -40,26 +44,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
     private string $password;
 
     #[ORM\Column]
+    #[Serializer\Groups(['audit_log'])]
     private bool $isVerified = false;
 
     #[ORM\Column(updatable: false, columnDefinition: "DATETIME not null default current_timestamp")]
-    private \DateTimeImmutable $created_at;
+    #[Serializer\Groups(['audit_log'])]
+    private DateTimeImmutable $created_at;
 
     #[ORM\Column(columnDefinition: "DATETIME not null default current_timestamp on update current_timestamp")]
-    private \DateTimeImmutable $updated_at;
+    #[Serializer\Groups(['audit_log'])]
+    private DateTimeImmutable $updated_at;
 
     /**
      * @var Collection<int, Article>
      */
     #[ORM\OneToMany(targetEntity: Article::class, mappedBy: 'user')]
-    #[Ignore]
     private Collection $articles;
 
     /**
      * @var Collection<int, AuditLog>
      */
     #[ORM\OneToMany(targetEntity: AuditLog::class, mappedBy: 'user')]
-    #[Ignore]
     private Collection $auditLogs;
 
     public function __construct()
@@ -191,24 +196,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(DateTimeImmutable $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
 
@@ -272,5 +277,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
         }
 
         return implode(' ', $names);
+    }
+
+    #[Serializer\Groups(['audit_log'])]
+    public function getObfuscatedPassword(): string
+    {
+        // ie: "$2y$13$RV..." this is enough to show that the password hash has changed
+        return substr($this->password, 0, 9) . '...';
     }
 }

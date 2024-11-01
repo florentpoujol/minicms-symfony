@@ -32,7 +32,7 @@ final class AuditLogListenerTest extends KernelTestCase
         // arrange
         $user = new User();
         $user->setEmail('the email');
-        $user->setPassword('whatever');
+        $user->setPassword('$2y$13$RVzGEbzCN');
         $user->setRoles(['ROLE_USER', 'ROLE_WRITER']);
         $datetime = new DateTimeImmutable('2024-10-29T10:52:00', new \DateTimeZone('+01:00'));
         $user->setCreatedAt(clone $datetime);
@@ -48,12 +48,13 @@ final class AuditLogListenerTest extends KernelTestCase
         self::assertSame(User::class, $lastAuditLog->getEntityFqcn());
 
         $after = $lastAuditLog->getData()['after'] ?? [];
+        dd($after);
         self::assertNotEmpty($after);
         self::assertSame('the email', $after['email']);
-        self::assertSame('whate(obfuscated)', $after['password']);
+        self::assertSame('$2y$13$RV...', $after['obfuscatedPassword']);
         self::assertSame(['ROLE_USER', 'ROLE_WRITER'], $after['roles']);
         self::assertFalse($after['isVerified']);
-        self::assertSame('2024-10-29T10:52:00+01:00', $after['createdAt']);
-        self::assertSame('2024-10-29T10:52:00+01:00', $after['updatedAt']);
+        self::assertSame('2024-10-29T10:52:00+01:00', $after['created_at']);
+        self::assertSame('2024-10-29T10:52:00+01:00', $after['updated_at']);
     }
 }

@@ -48,7 +48,6 @@ final class AuditLogListenerTest extends KernelTestCase
         self::assertSame(User::class, $lastAuditLog->getEntityFqcn());
 
         $after = $lastAuditLog->getData()['after'] ?? [];
-        dd($after);
         self::assertNotEmpty($after);
         self::assertSame('the email', $after['email']);
         self::assertSame('$2y$13$RV...', $after['obfuscatedPassword']);

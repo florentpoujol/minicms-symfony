@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enums\SupportedLocale;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -67,6 +68,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
      */
     #[ORM\OneToMany(targetEntity: AuditLog::class, mappedBy: 'user')]
     private Collection $auditLogs;
+
+    #[ORM\Column(enumType: SupportedLocale::class, options: ['default' => SupportedLocale::fr->value])]
+    private SupportedLocale $locale = SupportedLocale::fr;
 
     public function __construct()
     {
@@ -285,5 +289,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Doctrin
     {
         // ie: "$2y$13$RV..." this is enough to show that the password hash has changed
         return substr($this->password, 0, 9) . '...';
+    }
+
+    public function getLocale(): SupportedLocale
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(SupportedLocale $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 }

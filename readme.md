@@ -6,7 +6,7 @@ The point of this project is both to practice and showcase my capabilities in we
 
 - User entity with built-in registration/login/logout
 - 3 roles: regular user, that can only post comments on articles, writers, that write/edit their articles and admins that can do every thing
-- access to a "profile" (currently almost empty) (at `/profile`) for all logged-in users
+- access to a "profile" (at `/profile`) for all logged-in users (not editable)
 - access to an admin section for the writers and admins with a list of articles (at `/admin/articles`)
 - a form to create or edit an article (at `/admin/articles/create` and `/admin/articles/{slug}/edit`)
 - a blog page that displays the currently published articles, with an excerpt of their content (at `/blog`)
@@ -20,6 +20,7 @@ The point of this project is both to practice and showcase my capabilities in we
 - Forms
 - Application tests
 - Custom normalizer (almost)
+- Translations
 - Doctrine 
   - entities with relations + repositories
   - entities lifecycle events

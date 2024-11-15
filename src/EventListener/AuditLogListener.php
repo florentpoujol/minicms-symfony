@@ -87,7 +87,9 @@ final class AuditLogListener
         $user = null;
         if (\PHP_SAPI === 'cli') {
             // get the full actual CLI command entered in the terminal, which gives the options and arguments
-            $args = implode(' ', $_SERVER['argv'] ?? []);
+            $args = $_SERVER['argv'] ?? [];
+            \assert(\is_array($args));
+            $args = implode(' ', $args);
             $context = "cli: $args";
 
             // could also get the name of the current job, if possible (probably need the same shenanigans as for the Artisan command name)

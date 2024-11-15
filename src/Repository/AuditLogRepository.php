@@ -31,12 +31,11 @@ final class AuditLogRepository extends ServiceEntityRepository
     /**
      * @return ArrayCollection<int, AuditLog>
      */
-    public function getForEntity( // @phpstan-ignore-line (Parameters should have "App\Entity\Article" types as the only types passed to this method)
+    public function getForEntity(
         DoctrineEntity $entity,
         int $page = 1,
         int $perPage = 50,
-    ): ArrayCollection
-    {
+    ): ArrayCollection {
         /** @var array<int, AuditLog> $array */
         $array = $this->createQueryBuilder('al')
 

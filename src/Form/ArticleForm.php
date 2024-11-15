@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use function Symfony\Component\Translation\t;
 
+/**
+ * @extends AbstractType<Article>
+ */
 final class ArticleForm extends AbstractType
 {
     /**

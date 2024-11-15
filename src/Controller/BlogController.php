@@ -32,7 +32,7 @@ final class BlogController extends AbstractController
     #[Route('/blog', name: 'app_blog')]
     public function blog(): Response
     {
-        $this->twig->addFilter(new TwigFilter('show_excerpt', fn ($text): string => substr($text, 0, 500)));
+        $this->twig->addFilter(new TwigFilter('show_excerpt', fn (string $text): string => substr($text, 0, 500)));
 
         return $this->render('blog/index.html.twig', [
             'articles' => $this->articleRepository->getAllPublished(),

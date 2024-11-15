@@ -20,11 +20,11 @@ class AuditLog implements DoctrineEntity
     #[ORM\Column(length: 1_000)]
     private string $context = '';
 
-    #[ORM\Column(type: 'json')]
     /**
-     * @var array{before?: array<string, mixed>, after?: array<string, mixed>} $data
+     * @var array{before?: array<string, mixed>, after?: array<string, mixed>}
      */
-    private array $data = []; // @phpstan-ignore-line (still gives the "...  no value type specified ..." error)
+    #[ORM\Column(type: 'json')]
+    private array $data = [];
 
     #[ORM\Column(updatable: false, columnDefinition: "TIMESTAMP(2) default current_timestamp")]
     private ?\DateTimeImmutable $created_at = null;

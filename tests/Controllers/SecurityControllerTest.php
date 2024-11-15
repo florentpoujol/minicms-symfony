@@ -34,7 +34,7 @@ final class SecurityControllerTest extends WebTestCase
     }
 
     /**
-     * @return array<string, list<Closure(): User|string>>
+     * @return array<string, list<(Closure(): User)|string>>
      */
     public static function getAllUsers(): array
     {

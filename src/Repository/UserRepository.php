@@ -25,7 +25,7 @@ final class UserRepository extends AppServiceEntityRepository implements Passwor
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) { // @phpstan-ignore-line (because of the genericity definition above the class, PHPStan thinks that this check is not useful, but I'm not sure)
-            throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', $user::class));
+            throw new UnsupportedUserException(\sprintf('Instances of "%s" are not supported.', $user::class)); // @phpstan-ignore-line (param expect ..., mixed given) (probably a bug with v2.0)
         }
 
         $user->setPassword($newHashedPassword);

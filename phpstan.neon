@@ -5,7 +5,7 @@ includes:
     - tools/vendor/phpstan/phpstan-symfony/rules.neon
 
 parameters:
-    level: 9
+    level: 10
     paths:
         - config
         - src
@@ -31,5 +31,10 @@ parameters:
                 - tests/*
         -
             message: '#Readonly property .+ is assigned outside of the constructor\.#'
+            paths:
+                - tests/*
+        -
+            # this error exist despite the closures that return the user to be property typed as (Closure(): User), but the return type is understood as (User|mixed)
+            message: '#Parameter \#1 \$user of method .+KernelBrowser::loginUser\(\) expects .+UserInterface, mixed given\.#'
             paths:
                 - tests/*

@@ -108,12 +108,12 @@
         "type-check": "php ./tools/vendor/bin/phpstan --ansi --memory-limit=2G",
         "tests": "php bin/phpunit",
         "fix": [
-            "@rector-fix",
+
             "@style-fix",
             "@type-check"
         ],
         "all": [
-            "@rector-fix",
+
             "@style-fix",
             "@type-check",
             "@tests"
